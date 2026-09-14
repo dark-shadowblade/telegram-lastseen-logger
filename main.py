@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from telethon import TelegramClient
 from telethon.sessions import StringSession
@@ -12,7 +13,6 @@ from telethon.tl.types import (
     UserStatusLastMonth,
 )
 
-
 API_ID = int(os.environ["API_ID"])
 API_HASH = os.environ["API_HASH"]
 SESSION_STRING = os.environ["SESSION_STRING"]
@@ -20,6 +20,7 @@ SESSION_STRING = os.environ["SESSION_STRING"]
 TARGET_ID = int(os.environ["TARGET_USERNAME"])
 TARGET_ACCESS_HASH = int(os.environ["TARGET_ACCESS_HASH"])
 
+IST = ZoneInfo("Asia/Kolkata")
 LOG_FILE = "last_seen.log"
 
 
@@ -32,7 +33,9 @@ def get_status(user):
     if isinstance(status, UserStatusOffline):
         return (
             "Last seen at "
-            + status.was_online.astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            + status.was_online.astimezone(IST).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
         )
 
     if isinstance(status, UserStatusRecently):
@@ -48,7 +51,6 @@ def get_status(user):
 
 
 async def main():
-
     async with TelegramClient(
         StringSession(SESSION_STRING),
         API_ID,
@@ -64,7 +66,7 @@ async def main():
 
         current_status = get_status(user)
 
-        now = datetime.now().astimezone().strftime(
+        now = datetime.now(IST).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
 
@@ -83,17 +85,16 @@ async def main():
         print("Previous status:", previous_status)
 
         if current_status != previous_status:
-
             with open(LOG_FILE, "a", encoding="utf-8") as f:
                 f.write(
                     f"{now} | Status: {current_status}\n"
                 )
 
             print("Status changed — logged.")
-
         else:
             print("No change — nothing logged.")
 
 
-import asyncio
-asyncio.run(main())
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
