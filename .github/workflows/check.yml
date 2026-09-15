@@ -2,7 +2,8 @@ name: Telegram Last Seen Logger
 
 on:
   schedule:
-    - cron: "53 5 * * *"
+    - cron: "45 9 * * *"
+      timezone: "Asia/Kolkata"
   workflow_dispatch:
 
 permissions:
