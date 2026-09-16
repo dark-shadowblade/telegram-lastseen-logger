@@ -84,4 +84,27 @@ async def check_status(client):
 
         print("Status changed — logged.")
     else:
-        print("
+        print("No change — nothing logged.")
+
+
+async def main():
+    async with TelegramClient(
+        StringSession(SESSION_STRING),
+        API_ID,
+        API_HASH
+    ) as client:
+
+        print("Telegram logger started.")
+        print("Checking every 60 seconds...")
+
+        while True:
+            try:
+                await check_status(client)
+            except Exception as e:
+                print("Error:", e)
+
+            await asyncio.sleep(CHECK_INTERVAL)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
