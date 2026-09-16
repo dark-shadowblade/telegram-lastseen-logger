@@ -1,4 +1,5 @@
 import os
+import asyncio
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -22,6 +23,7 @@ TARGET_ACCESS_HASH = int(os.environ["TARGET_ACCESS_HASH"])
 
 IST = ZoneInfo("Asia/Kolkata")
 LOG_FILE = "last_seen.log"
+CHECK_INTERVAL = 60  # seconds
 
 
 def get_status(user):
@@ -50,51 +52,36 @@ def get_status(user):
     return "Unknown"
 
 
-async def main():
-    async with TelegramClient(
-        StringSession(SESSION_STRING),
-        API_ID,
-        API_HASH
-    ) as client:
+async def check_status(client):
+    peer = InputPeerUser(
+        user_id=TARGET_ID,
+        access_hash=TARGET_ACCESS_HASH
+    )
 
-        peer = InputPeerUser(
-            user_id=TARGET_ID,
-            access_hash=TARGET_ACCESS_HASH
-        )
+    user = await client.get_entity(peer)
+    current_status = get_status(user)
 
-        user = await client.get_entity(peer)
+    print("Current status:", current_status)
 
-        current_status = get_status(user)
+    previous_status = None
 
-        now = datetime.now(IST).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+    if os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "r", encoding="utf-8") as f:
+            lines = [line.strip() for line in f if line.strip()]
 
-        previous_status = None
+        if lines:
+            previous_status = lines[-1].split(
+                " | Status: ", 1
+            )[-1]
 
-        if os.path.exists(LOG_FILE):
-            with open(LOG_FILE, "r", encoding="utf-8") as f:
-                lines = [line.strip() for line in f if line.strip()]
+    print("Previous status:", previous_status)
 
-            if lines:
-                previous_status = lines[-1].split(
-                    " | Status: ", 1
-                )[-1]
+    if current_status != previous_status:
+        now = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
-        print("Current status:", current_status)
-        print("Previous status:", previous_status)
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(f"{now} | Status: {current_status}\n")
 
-        if current_status != previous_status:
-            with open(LOG_FILE, "a", encoding="utf-8") as f:
-                f.write(
-                    f"{now} | Status: {current_status}\n"
-                )
-
-            print("Status changed — logged.")
-        else:
-            print("No change — nothing logged.")
-
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+        print("Status changed — logged.")
+    else:
+        print("
