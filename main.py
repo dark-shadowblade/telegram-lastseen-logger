@@ -1,10 +1,11 @@
 import os
 import asyncio
 import json
-import threading
+import base64
+import urllib.request
+import urllib.error
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
 from telethon import TelegramClient
 from telethon.sessions import StringSession
@@ -17,9 +18,9 @@ from telethon.tl.types import (
     UserStatusLastMonth,
 )
 
-# ============================================================
-# TELEGRAM CONFIGURATION
-# ============================================================
+# =========================
+# TELEGRAM CONFIG
+# =========================
 
 API_ID = int(os.environ["API_ID"])
 API_HASH = os.environ["API_HASH"]
@@ -28,48 +29,35 @@ SESSION_STRING = os.environ["SESSION_STRING"]
 TARGET_ID = int(os.environ["TARGET_USERNAME"])
 TARGET_ACCESS_HASH = int(os.environ["TARGET_ACCESS_HASH"])
 
-# ============================================================
-# GENERAL CONFIGURATION
-# ============================================================
+# =========================
+# GITHUB CONFIG
+# =========================
+
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+
+GITHUB_REPO = "dark-shadowblade/telegram-lastseen-logger"
+GITHUB_FILE = "activity_7days.json"
+
+# =========================
+# OTHER CONFIG
+# =========================
 
 IST = ZoneInfo("Asia/Kolkata")
-
 DATA_FILE = "activity_7days.json"
 CHECK_INTERVAL = 60
 
 
-# ============================================================
-# WEB DASHBOARD SERVER
-# ============================================================
-
-def start_web_server():
-    port_env = os.environ.get("PORT")
-
-    print("PORT environment variable:", port_env)
-
-    port = int(port_env or "3000")
-
-    server = ThreadingHTTPServer(
-        ("0.0.0.0", port),
-        SimpleHTTPRequestHandler
-    )
-
-    print(f"Dashboard server running on port {port}")
-
-    server.serve_forever()
-
-
-# ============================================================
+# =========================
 # TIME
-# ============================================================
+# =========================
 
 def now_ist():
     return datetime.now(IST)
 
 
-# ============================================================
-# DATA STORAGE
-# ============================================================
+# =========================
+# DATA
+# =========================
 
 def load_data():
     if not os.path.exists(DATA_FILE):
@@ -81,7 +69,6 @@ def load_data():
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-
     except Exception:
         return {
             "sessions": [],
@@ -94,31 +81,27 @@ def save_data(data):
         json.dump(data, f, indent=2)
 
 
-# ============================================================
-# KEEP ONLY LAST 7 DAYS
-# ============================================================
-
 def clean_old_data(data):
     cutoff = now_ist() - timedelta(days=7)
 
-    cleaned_sessions = []
+    cleaned = []
 
     for session in data.get("sessions", []):
         try:
             start = datetime.fromisoformat(session["start"])
 
             if start >= cutoff:
-                cleaned_sessions.append(session)
+                cleaned.append(session)
 
         except Exception:
             pass
 
-    data["sessions"] = cleaned_sessions
+    data["sessions"] = cleaned
 
 
-# ============================================================
+# =========================
 # TELEGRAM STATUS
-# ============================================================
+# =========================
 
 def get_status(user):
     status = user.status
@@ -141,11 +124,12 @@ def get_status(user):
     return "UNKNOWN"
 
 
-# ============================================================
-# ADD COMPLETED SESSION
-# ============================================================
+# =========================
+# SESSION
+# =========================
 
 def add_session(data, start, end):
+
     if not start or not end:
         return
 
@@ -165,9 +149,85 @@ def add_session(data, start, end):
     })
 
 
-# ============================================================
-# TELEGRAM ACTIVITY TRACKER
-# ============================================================
+# =========================
+# GITHUB UPLOAD
+# =========================
+
+def upload_to_github():
+
+    try:
+
+        with open(DATA_FILE, "rb") as f:
+            content = base64.b64encode(f.read()).decode("utf-8")
+
+        api_url = (
+            f"https://api.github.com/repos/"
+            f"{GITHUB_REPO}/contents/{GITHUB_FILE}"
+        )
+
+        headers = {
+            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "telegram-activity-logger"
+        }
+
+        # Get current file SHA
+        sha = None
+
+        request = urllib.request.Request(
+            api_url,
+            headers=headers,
+            method="GET"
+        )
+
+        try:
+
+            with urllib.request.urlopen(request, timeout=20) as response:
+                existing = json.loads(response.read().decode())
+                sha = existing.get("sha")
+
+        except urllib.error.HTTPError as e:
+
+            if e.code != 404:
+                raise
+
+        payload = {
+            "message": "Update Telegram activity data",
+            "content": content
+        }
+
+        if sha:
+            payload["sha"] = sha
+
+        data = json.dumps(payload).encode("utf-8")
+
+        request = urllib.request.Request(
+            api_url,
+            data=data,
+            headers={
+                **headers,
+                "Content-Type": "application/json"
+            },
+            method="PUT"
+        )
+
+        with urllib.request.urlopen(request, timeout=20) as response:
+
+            if response.status in (200, 201):
+                print("GitHub: activity_7days.json updated.")
+
+    except Exception as e:
+
+        print(
+            "GitHub upload error:",
+            repr(e)
+        )
+
+
+# =========================
+# TELEGRAM TRACKER
+# =========================
 
 async def tracker():
 
@@ -193,39 +253,67 @@ async def tracker():
         while True:
 
             try:
+
                 user = await client.get_entity(peer)
 
                 status = get_status(user)
 
                 current_time = now_ist()
 
-                # ------------------------------------------------
+                print(
+                    current_time.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                    status
+                )
+
+                # -------------------------
                 # ONLINE
-                # ------------------------------------------------
+                # -------------------------
 
                 if status == "ONLINE":
 
-                    if not data.get("current_online_since"):
+                    if not data.get(
+                        "current_online_since"
+                    ):
 
-                        data["current_online_since"] = (
-                            current_time.isoformat()
+                        data[
+                            "current_online_since"
+                        ] = current_time.isoformat()
+
+                        print(
+                            "ONLINE session started:",
+                            data[
+                                "current_online_since"
+                            ]
                         )
 
-                # ------------------------------------------------
+                # -------------------------
                 # OFFLINE
-                # ------------------------------------------------
+                # -------------------------
 
                 elif status == "OFFLINE":
 
-                    if data.get("current_online_since"):
+                    if data.get(
+                        "current_online_since"
+                    ):
 
-                        start = data["current_online_since"]
+                        start = data[
+                            "current_online_since"
+                        ]
 
-                        telegram_end = user.status.was_online
+                        telegram_end = (
+                            user.status.was_online
+                        )
 
                         if telegram_end:
-                            end = telegram_end.astimezone(IST)
+
+                            end = telegram_end.astimezone(
+                                IST
+                            )
+
                         else:
+
                             end = current_time
 
                         add_session(
@@ -234,26 +322,34 @@ async def tracker():
                             end.isoformat()
                         )
 
-                        data["current_online_since"] = None
+                        print(
+                            "Session recorded:",
+                            start,
+                            "→",
+                            end.isoformat()
+                        )
 
-                # ------------------------------------------------
+                        data[
+                            "current_online_since"
+                        ] = None
+
+                # -------------------------
                 # CLEAN OLD DATA
-                # ------------------------------------------------
+                # -------------------------
 
                 clean_old_data(data)
 
-                # ------------------------------------------------
-                # SAVE
-                # ------------------------------------------------
+                # -------------------------
+                # SAVE LOCAL
+                # -------------------------
 
                 save_data(data)
 
-                print(
-                    now_ist().strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    ),
-                    status
-                )
+                # -------------------------
+                # UPLOAD GITHUB
+                # -------------------------
+
+                upload_to_github()
 
             except Exception as e:
 
@@ -262,20 +358,15 @@ async def tracker():
                     repr(e)
                 )
 
-            await asyncio.sleep(CHECK_INTERVAL)
+            await asyncio.sleep(
+                CHECK_INTERVAL
+            )
 
 
-# ============================================================
-# START EVERYTHING
-# ============================================================
+# =========================
+# START
+# =========================
 
 if __name__ == "__main__":
-
-    web_thread = threading.Thread(
-        target=start_web_server,
-        daemon=True
-    )
-
-    web_thread.start()
 
     asyncio.run(tracker())
