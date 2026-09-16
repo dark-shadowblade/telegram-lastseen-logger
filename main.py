@@ -33,7 +33,10 @@ CHECK_INTERVAL = 60
 # ---------------- WEB DASHBOARD ----------------
 
 def start_web_server():
-    port = int(os.environ.get("PORT", "8080"))
+   port_env = os.environ.get("PORT")
+print("PORT environment variable:", port_env)
+
+port = int(port_env or "8080")
 
     server = ThreadingHTTPServer(
         ("0.0.0.0", port),
