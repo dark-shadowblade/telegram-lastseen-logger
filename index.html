@@ -7,142 +7,97 @@
 <title>Telegram Activity</title>
 
 <style>
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
-body{
-    margin:0;
-    background:#08090d;
-    color:#f5f5f5;
-    font-family:Arial,sans-serif;
+body {
+    margin: 0;
+    background: #000;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding: 20px;
 }
 
-.container{
-    max-width:900px;
-    margin:auto;
-    padding:20px;
+.container {
+    max-width: 900px;
+    margin: auto;
 }
 
-h1{
-    margin:5px 0 25px;
-    font-size:28px;
+h1 {
+    margin-bottom: 20px;
 }
 
-.card{
-    background:#11131a;
-    border:1px solid #242733;
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:18px;
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
 }
 
-.label{
-    color:#8e93a3;
-    font-size:13px;
-    margin-bottom:8px;
+.card {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 18px;
 }
 
-.status{
-    font-size:25px;
-    font-weight:bold;
-    margin-bottom:18px;
+.label {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 8px;
 }
 
-.online{
-    color:#35e27b;
+.value {
+    font-size: 20px;
+    font-weight: bold;
 }
 
-.offline{
-    color:#aaa;
+.online {
+    color: #00ff66;
 }
 
-.stats{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
+.offline {
+    color: #ff4444;
 }
 
-.stat{
-    background:#181b24;
-    border-radius:14px;
-    padding:15px;
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 20px 0;
+    background: #111;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 8px;
 }
 
-.value{
-    font-size:20px;
-    font-weight:bold;
+.section {
+    margin-top: 20px;
 }
 
-select{
-    width:100%;
-    padding:14px;
-    background:#181b24;
-    color:white;
-    border:1px solid #303442;
-    border-radius:12px;
-    font-size:16px;
+.day {
+    background: #111;
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
 }
 
-.session{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:14px 0;
-    border-bottom:1px solid #242733;
+.session {
+    padding: 10px 0;
+    border-bottom: 1px solid #222;
 }
 
-.session:last-child{
-    border-bottom:none;
+.error {
+    background: #300;
+    border: 1px solid #900;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+    margin-bottom: 15px;
 }
 
-.day-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 5px;
-    border-bottom:1px solid #242733;
-}
-
-.day-row:last-child{
-    border-bottom:none;
-}
-
-.small{
-    color:#9297a6;
-    font-size:13px;
-    margin-top:5px;
-}
-
-.empty{
-    color:#888;
-    padding:20px 0;
-}
-
-.refresh{
-    color:#777;
-    font-size:12px;
-    margin-top:15px;
-    text-align:right;
-}
-
-@media(max-width:600px){
-    .container{
-        padding:14px;
-    }
-
-    .stats{
-        grid-template-columns:1fr;
-    }
-
-    .session{
-        display:block;
-    }
-
-    .session b{
-        display:block;
-        margin-top:7px;
-    }
+.muted {
+    color: #888;
 }
 </style>
 </head>
@@ -153,432 +108,160 @@ select{
 
 <h1>Telegram Activity</h1>
 
-<!-- LIVE STATUS -->
+<div id="error" class="error"></div>
 
-<div class="card">
+<div class="cards">
 
-<div class="label">LIVE STATUS</div>
+    <div class="card">
+        <div class="label">Live Status</div>
+        <div id="status" class="value">Loading...</div>
+    </div>
 
-<div id="liveStatus" class="status offline">
-Loading...
-</div>
+    <div class="card">
+        <div class="label">Online Since</div>
+        <div id="onlineSince" class="value">—</div>
+    </div>
 
-<div class="stats">
+    <div class="card">
+        <div class="label">Last Seen</div>
+        <div id="lastSeen" class="value">—</div>
+    </div>
 
-<div class="stat">
-<div class="label">Online Since</div>
-<div id="onlineSince" class="value">—</div>
-</div>
+    <div class="card">
+        <div class="label">Today Total Online</div>
+        <div id="todayTotal" class="value">0s</div>
+    </div>
 
-<div class="stat">
-<div class="label">Last Seen</div>
-<div id="lastSeen" class="value">—</div>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- TODAY -->
-
-<div class="card">
-
-<div class="label">TODAY'S RECORD</div>
-
-<div class="stats">
-
-<div class="stat">
-<div class="label">Total Online</div>
-<div id="todayTotal" class="value">0s</div>
-</div>
-
-<div class="stat">
-<div class="label">Sessions</div>
-<div id="todaySessions" class="value">0</div>
-</div>
+    <div class="card">
+        <div class="label">Sessions</div>
+        <div id="sessionCount" class="value">0</div>
+    </div>
 
 </div>
 
-</div>
+<div class="section">
 
-
-<!-- DAY SELECTOR -->
-
-<div class="card">
-
-<div class="label">ACTIVITY HISTORY</div>
+<h2>Activity History</h2>
 
 <select id="daySelect">
-<option value="all">All 7 Days</option>
+    <option value="all">All 7 Days</option>
 </select>
-
-</div>
-
-
-<!-- SUMMARY -->
-
-<div class="card" id="summaryCard">
-
-<div class="label">7-DAY SUMMARY</div>
 
 <div id="summary"></div>
 
 </div>
 
+<div class="section">
 
-<!-- DETAILS -->
-
-<div class="card" id="detailsCard">
-
-<div class="label">DAY DETAILS</div>
+<h2>Day Details</h2>
 
 <div id="details"></div>
 
 </div>
 
-
-<div class="refresh">
+<p class="muted">
 Automatically refreshes every 60 seconds
-</div>
+</p>
 
 </div>
-
 
 <script>
 
+const DATA_URL =
+"https://raw.githubusercontent.com/dark-shadowblade/telegram-activity-data/main/activity_7days.json";
+
+const TIMEZONE = "Asia/Kolkata";
+
 let data = null;
+let selectedDay = "all";
 
-const DATA_URL = "https://raw.githubusercontent.com/dark-shadowblade/telegram-activity-data/main/activity_7days.json";
 
-
-/* =========================
-   TIME HELPERS
-========================= */
-
-function pad(n){
-    return String(n).padStart(2,"0");
+function $(id) {
+    return document.getElementById(id);
 }
 
 
-function formatDuration(seconds){
+function formatDateTime(iso) {
 
-    seconds = Math.max(0,Math.floor(seconds));
+    if (!iso) return "—";
 
-    const h = Math.floor(seconds / 3600);
-
-    const m = Math.floor((seconds % 3600) / 60);
-
-    const s = seconds % 60;
-
-    if(h > 0){
-        return `${h}h ${m}m`;
-    }
-
-    if(m > 0){
-        return `${m}m ${s}s`;
-    }
-
-    return `${s}s`;
-}
-
-
-function formatTime(iso){
-
-    if(!iso){
-        return "—";
-    }
-
-    const d = new Date(iso);
-
-    return d.toLocaleTimeString(
-        "en-IN",
-        {
-            hour:"2-digit",
-            minute:"2-digit",
-            second:"2-digit",
-            hour12:false,
-            timeZone:"Asia/Kolkata"
-        }
-    );
-}
-
-
-function formatDate(iso){
-
-    if(!iso){
-        return "—";
-    }
-
-    const d = new Date(iso);
-
-    return d.toLocaleDateString(
-        "en-IN",
-        {
-            day:"2-digit",
-            month:"short",
-            year:"numeric",
-            timeZone:"Asia/Kolkata"
-        }
-    );
-}
-
-
-function formatDay(day){
-
-    const d = new Date(day + "T00:00:00+05:30");
-
-    return d.toLocaleDateString(
-        "en-IN",
-        {
-            day:"2-digit",
-            month:"short",
-            timeZone:"Asia/Kolkata"
-        }
-    );
-}
-
-
-/* =========================
-   IST DATE
-========================= */
-
-function todayIST(){
-
-    return new Intl.DateTimeFormat(
-        "en-CA",
-        {
-            timeZone:"Asia/Kolkata",
-            year:"numeric",
-            month:"2-digit",
-            day:"2-digit"
-        }
-    ).format(new Date());
+    return new Intl.DateTimeFormat("en-IN", {
+        timeZone: TIMEZONE,
+        dateStyle: "medium",
+        timeStyle: "short"
+    }).format(new Date(iso));
 
 }
 
 
-/* =========================
-   GET LAST 7 DAYS
-========================= */
+function getDayKey(date) {
 
-function getLast7Days(){
+    return new Intl.DateTimeFormat("en-CA", {
+        timeZone: TIMEZONE
+    }).format(date);
+
+}
+
+
+function formatDuration(seconds) {
+
+    seconds = Math.max(0, Math.floor(seconds));
+
+    const days = Math.floor(seconds / 86400);
+    seconds %= 86400;
+
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+
+    let result = [];
+
+    if (days) result.push(days + "d");
+    if (hours) result.push(hours + "h");
+    if (minutes) result.push(minutes + "m");
+
+    result.push(seconds + "s");
+
+    return result.join(" ");
+}
+
+
+function getLast7Days() {
 
     const result = [];
 
     const now = new Date();
 
-    const formatter = new Intl.DateTimeFormat(
-        "en-CA",
-        {
-            timeZone:"Asia/Kolkata",
-            year:"numeric",
-            month:"2-digit",
-            day:"2-digit"
-        }
-    );
+    for (let i = 0; i < 7; i++) {
 
-    for(let i=0;i<7;i++){
+        const d = new Date(now);
 
-        const d = new Date(
-            now.getTime() - i * 86400000
-        );
+        d.setDate(d.getDate() - i);
 
-        result.push(formatter.format(d));
+        result.push(getDayKey(d));
 
     }
 
     return result;
-}
-
-
-/* =========================
-   SESSIONS FOR DAY
-========================= */
-
-function getSessionsForDay(day){
-
-    if(!data || !data.sessions){
-        return [];
-    }
-
-    return data.sessions.filter(
-        session =>
-            session.start.substring(0,10) === day
-    );
 
 }
 
 
-/* =========================
-   CALCULATE DURATION
-========================= */
+function populateDays() {
 
-function calculateTotal(sessions){
-
-    let total = 0;
-
-    sessions.forEach(session => {
-
-        const start = new Date(session.start);
-
-        const end = new Date(session.end);
-
-        total += (end - start) / 1000;
-
-    });
-
-    return total;
-
-}
-
-
-/* =========================
-   LIVE STATUS
-========================= */
-
-function renderLive(){
-
-    const online =
-        data.current_online_since !== null;
-
-    const statusEl =
-        document.getElementById("liveStatus");
-
-    const onlineSince =
-        document.getElementById("onlineSince");
-
-    const lastSeen =
-        document.getElementById("lastSeen");
-
-
-    if(online){
-
-        statusEl.textContent = "🟢 ONLINE";
-
-        statusEl.className =
-            "status online";
-
-        onlineSince.textContent =
-            formatDate(
-                data.current_online_since
-            )
-            + " "
-            +
-            formatTime(
-                data.current_online_since
-            );
-
-    }else{
-
-        statusEl.textContent = "⚪ OFFLINE";
-
-        statusEl.className =
-            "status offline";
-
-        onlineSince.textContent = "—";
-
-    }
-
-
-    if(data.sessions && data.sessions.length > 0){
-
-        const latest =
-            data.sessions[data.sessions.length - 1];
-
-        lastSeen.textContent =
-            formatDate(latest.end)
-            + " "
-            +
-            formatTime(latest.end);
-
-    }else{
-
-        lastSeen.textContent = "—";
-
-    }
-
-}
-
-
-/* =========================
-   TODAY
-========================= */
-
-function renderToday(){
-
-    const today = todayIST();
-
-    const sessions =
-        getSessionsForDay(today);
-
-    let total =
-        calculateTotal(sessions);
-
-
-    /* Add current online session */
-
-    if(data.current_online_since){
-
-        const start =
-            new Date(
-                data.current_online_since
-            );
-
-        const now =
-            new Date();
-
-        total +=
-            Math.max(
-                0,
-                (now - start) / 1000
-            );
-
-    }
-
-
-    document.getElementById(
-        "todaySessions"
-    ).textContent =
-        sessions.length +
-        (data.current_online_since ? 1 : 0);
-
-
-    document.getElementById(
-        "todayTotal"
-    ).textContent =
-        formatDuration(total);
-
-}
-
-
-/* =========================
-   POPULATE DROPDOWN
-========================= */
-
-function populateDays(){
-
-    const select =
-        document.getElementById("daySelect");
-
+    const select = $("daySelect");
 
     select.innerHTML =
         '<option value="all">All 7 Days</option>';
 
+    getLast7Days().forEach(day => {
 
-    const days =
-        getLast7Days();
-
-
-    days.forEach(day => {
-
-        const option =
-            document.createElement("option");
+        const option = document.createElement("option");
 
         option.value = day;
-
-        option.textContent =
-            formatDay(day);
+        option.textContent = day;
 
         select.appendChild(option);
 
@@ -587,189 +270,248 @@ function populateDays(){
 }
 
 
-/* =========================
-   7 DAY SUMMARY
-========================= */
+function sessionDuration(session) {
 
-function renderSummary(){
+    const start = new Date(session.start);
 
-    const summary =
-        document.getElementById("summary");
+    const end = session.end
+        ? new Date(session.end)
+        : new Date();
 
-    summary.innerHTML = "";
+    return Math.max(
+        0,
+        (end - start) / 1000
+    );
 
-
-    const days =
-        getLast7Days();
-
-
-    days.forEach(day => {
-
-        const sessions =
-            getSessionsForDay(day);
-
-        let total =
-            calculateTotal(sessions);
+}
 
 
-        /* Current online time */
+function getTodayTotal() {
 
-        if(
-            data.current_online_since &&
-            data.current_online_since.substring(0,10) === day
-        ){
+    if (!data) return 0;
 
-            const start =
-                new Date(
-                    data.current_online_since
-                );
+    const today = getDayKey(new Date());
 
-            total +=
-                Math.max(
-                    0,
-                    (new Date() - start) / 1000
-                );
+    let total = 0;
+
+    for (const session of data.sessions || []) {
+
+        if (getDayKey(new Date(session.start)) === today) {
+
+            total += sessionDuration(session);
 
         }
 
+    }
 
-        const row =
-            document.createElement("div");
+    if (data.current_online_since) {
 
-        row.className =
-            "day-row";
+        if (
+            getDayKey(
+                new Date(data.current_online_since)
+            ) === today
+        ) {
 
+            total +=
+                (Date.now() -
+                new Date(data.current_online_since).getTime())
+                / 1000;
 
-        row.innerHTML = `
+        }
 
-            <div>
+    }
 
-                <b>${formatDay(day)}</b>
-
-                <div class="small">
-
-                    ${sessions.length}
-                    completed session${sessions.length !== 1 ? "s" : ""}
-
-                </div>
-
-            </div>
-
-            <b>${formatDuration(total)}</b>
-
-        `;
-
-
-        summary.appendChild(row);
-
-    });
+    return total;
 
 }
 
 
-/* =========================
-   DAY DETAILS
-========================= */
+function renderTop() {
 
-function renderDetails(day){
+    const status =
+        data.last_status ||
+        (data.current_online_since
+            ? "ONLINE"
+            : "OFFLINE");
 
-    const details =
-        document.getElementById("details");
+    const statusElement = $("status");
 
-    const detailsCard =
-        document.getElementById("detailsCard");
+    statusElement.textContent = status;
 
+    statusElement.className = "value";
 
-    if(day === "all"){
+    if (status === "ONLINE") {
 
-        detailsCard.style.display =
-            "none";
+        statusElement.classList.add("online");
 
-        return;
+    } else {
 
-    }
-
-
-    detailsCard.style.display =
-        "block";
-
-
-    details.innerHTML = "";
-
-
-    const sessions =
-        getSessionsForDay(day);
-
-
-    if(!sessions.length){
-
-        details.innerHTML =
-            '<div class="empty">No recorded activity for this day.</div>';
-
-        return;
+        statusElement.classList.add("offline");
 
     }
 
 
-    sessions.forEach(session => {
-
-        const start =
-            new Date(session.start);
-
-        const end =
-            new Date(session.end);
-
-        const duration =
-            (end - start) / 1000;
+    $("onlineSince").textContent =
+        data.current_online_since
+            ? formatDateTime(data.current_online_since)
+            : "—";
 
 
-        const div =
-            document.createElement("div");
+    $("lastSeen").textContent =
+        data.last_seen
+            ? formatDateTime(data.last_seen)
+            : "—";
 
-        div.className =
-            "session";
 
+    $("todayTotal").textContent =
+        formatDuration(getTodayTotal());
+
+
+    $("sessionCount").textContent =
+        (data.sessions || []).length;
+
+}
+
+
+function renderSummary() {
+
+    const container = $("summary");
+
+    container.innerHTML = "";
+
+    const days = getLast7Days();
+
+    days.forEach(day => {
+
+        let total = 0;
+        let count = 0;
+
+        for (const session of data.sessions || []) {
+
+            if (
+                getDayKey(
+                    new Date(session.start)
+                ) === day
+            ) {
+
+                total += sessionDuration(session);
+                count++;
+
+            }
+
+        }
+
+        const div = document.createElement("div");
+
+        div.className = "day";
 
         div.innerHTML = `
-
-            <div>
-
-                🟢 ${formatTime(session.start)}
-                →
-                ${formatTime(session.end)}
-
-            </div>
-
-            <b>${formatDuration(duration)}</b>
-
+            <strong>${day}</strong>
+            <br>
+            Online: ${formatDuration(total)}
+            <br>
+            Sessions: ${count}
         `;
 
-
-        details.appendChild(div);
+        container.appendChild(div);
 
     });
 
 }
 
 
-/* =========================
-   LOAD DATA
-========================= */
+function renderDetails() {
 
-async function loadData(){
+    const container = $("details");
 
-    try{
+    container.innerHTML = "";
+
+    let sessions = data.sessions || [];
+
+    if (selectedDay !== "all") {
+
+        sessions = sessions.filter(session =>
+
+            getDayKey(
+                new Date(session.start)
+            ) === selectedDay
+
+        );
+
+    }
+
+
+    if (!sessions.length) {
+
+        container.innerHTML =
+            '<div class="muted">No recorded sessions.</div>';
+
+        return;
+
+    }
+
+
+    sessions
+        .slice()
+        .reverse()
+        .forEach(session => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "day";
+
+            div.innerHTML = `
+                <div class="session">
+                    <strong>
+                        ${formatDateTime(session.start)}
+                    </strong>
+                    <br>
+                    End:
+                    ${
+                        session.end
+                        ? formatDateTime(session.end)
+                        : "Currently online"
+                    }
+                    <br>
+                    Duration:
+                    ${formatDuration(sessionDuration(session))}
+                </div>
+            `;
+
+            container.appendChild(div);
+
+        });
+
+}
+
+
+function render() {
+
+    if (!data) return;
+
+    renderTop();
+    renderSummary();
+    renderDetails();
+
+}
+
+
+async function loadData() {
+
+    try {
+
+        const url =
+            DATA_URL +
+            "?t=" +
+            Date.now();
 
         const response =
-            await fetch(
-                DATA_URL + "?t=" + Date.now(),
-                {
-                    cache:"no-store"
-                }
-            );
+            await fetch(url, {
+                cache: "no-store"
+            });
 
-
-        if(!response.ok){
+        if (!response.ok) {
 
             throw new Error(
                 "HTTP " + response.status
@@ -777,67 +519,58 @@ async function loadData(){
 
         }
 
+        data = await response.json();
 
-        data =
-            await response.json();
+        $("error").style.display = "none";
 
+        render();
 
-        populateDays();
+    }
+    catch (error) {
 
-        renderLive();
+        console.error(error);
 
-        renderToday();
+        $("error").style.display = "block";
 
-        renderSummary();
+        $("error").textContent =
+            "Unable to load activity data: " +
+            error.message;
 
-        renderDetails(
-            document.getElementById(
-                "daySelect"
-            ).value
-        );
-
-
-    }catch(error){
-
-        console.log(
-            "Data loading error:",
-            error
-        );
+        $("status").textContent =
+            "Data Error";
 
     }
 
 }
 
 
-/* =========================
-   DROPDOWN
-========================= */
-
-document
-.getElementById("daySelect")
-.addEventListener(
+$("daySelect").addEventListener(
     "change",
-    function(){
+    function () {
 
-        renderDetails(
-            this.value
-        );
+        selectedDay = this.value;
+
+        renderDetails();
 
     }
 );
 
 
-/* =========================
-   START
-========================= */
+populateDays();
 
 loadData();
 
+setInterval(loadData, 60000);
 
-setInterval(
-    loadData,
-    60000
-);
+setInterval(() => {
+
+    if (data) {
+
+        renderTop();
+
+    }
+
+}, 1000);
 
 </script>
 
