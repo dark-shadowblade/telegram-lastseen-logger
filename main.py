@@ -17,6 +17,10 @@ from telethon.tl.types import (
     UserStatusLastMonth,
 )
 
+# ============================================================
+# TELEGRAM CONFIGURATION
+# ============================================================
+
 API_ID = int(os.environ["API_ID"])
 API_HASH = os.environ["API_HASH"]
 SESSION_STRING = os.environ["SESSION_STRING"]
@@ -24,19 +28,26 @@ SESSION_STRING = os.environ["SESSION_STRING"]
 TARGET_ID = int(os.environ["TARGET_USERNAME"])
 TARGET_ACCESS_HASH = int(os.environ["TARGET_ACCESS_HASH"])
 
+# ============================================================
+# GENERAL CONFIGURATION
+# ============================================================
+
 IST = ZoneInfo("Asia/Kolkata")
 
 DATA_FILE = "activity_7days.json"
 CHECK_INTERVAL = 60
 
 
-# ---------------- WEB DASHBOARD ----------------
+# ============================================================
+# WEB DASHBOARD SERVER
+# ============================================================
 
 def start_web_server():
-   port_env = os.environ.get("PORT")
-print("PORT environment variable:", port_env)
+    port_env = os.environ.get("PORT")
 
-port = int(port_env or "8080")
+    print("PORT environment variable:", port_env)
+
+    port = int(port_env or "8080")
 
     server = ThreadingHTTPServer(
         ("0.0.0.0", port),
@@ -48,14 +59,19 @@ port = int(port_env or "8080")
     server.serve_forever()
 
 
-# ---------------- TRACKER ----------------
+# ============================================================
+# TIME
+# ============================================================
 
 def now_ist():
     return datetime.now(IST)
 
 
-def load_data():
+# ============================================================
+# DATA STORAGE
+# ============================================================
 
+def load_data():
     if not os.path.exists(DATA_FILE):
         return {
             "sessions": [],
@@ -74,24 +90,37 @@ def load_data():
 
 
 def save_data(data):
-
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
-def clean_old_data(data):
+# ============================================================
+# KEEP ONLY LAST 7 DAYS
+# ============================================================
 
+def clean_old_data(data):
     cutoff = now_ist() - timedelta(days=7)
 
-    data["sessions"] = [
-        session
-        for session in data["sessions"]
-        if datetime.fromisoformat(session["start"]) >= cutoff
-    ]
+    cleaned_sessions = []
 
+    for session in data.get("sessions", []):
+        try:
+            start = datetime.fromisoformat(session["start"])
+
+            if start >= cutoff:
+                cleaned_sessions.append(session)
+
+        except Exception:
+            pass
+
+    data["sessions"] = cleaned_sessions
+
+
+# ============================================================
+# TELEGRAM STATUS
+# ============================================================
 
 def get_status(user):
-
     status = user.status
 
     if isinstance(status, UserStatusOnline):
@@ -112,13 +141,20 @@ def get_status(user):
     return "UNKNOWN"
 
 
-def add_session(data, start, end):
+# ============================================================
+# ADD COMPLETED SESSION
+# ============================================================
 
+def add_session(data, start, end):
     if not start or not end:
         return
 
-    start_dt = datetime.fromisoformat(start)
-    end_dt = datetime.fromisoformat(end)
+    try:
+        start_dt = datetime.fromisoformat(start)
+        end_dt = datetime.fromisoformat(end)
+
+    except Exception:
+        return
 
     if end_dt <= start_dt:
         return
@@ -129,9 +165,14 @@ def add_session(data, start, end):
     })
 
 
+# ============================================================
+# TELEGRAM ACTIVITY TRACKER
+# ============================================================
+
 async def tracker():
 
     data = load_data()
+
     clean_old_data(data)
     save_data(data)
 
@@ -152,13 +193,16 @@ async def tracker():
         while True:
 
             try:
-
                 user = await client.get_entity(peer)
 
                 status = get_status(user)
+
                 current_time = now_ist()
 
-                # Person is ONLINE
+                # ------------------------------------------------
+                # ONLINE
+                # ------------------------------------------------
+
                 if status == "ONLINE":
 
                     if not data.get("current_online_since"):
@@ -167,7 +211,10 @@ async def tracker():
                             current_time.isoformat()
                         )
 
-                # Person is OFFLINE
+                # ------------------------------------------------
+                # OFFLINE
+                # ------------------------------------------------
+
                 elif status == "OFFLINE":
 
                     if data.get("current_online_since"):
@@ -189,11 +236,20 @@ async def tracker():
 
                         data["current_online_since"] = None
 
+                # ------------------------------------------------
+                # CLEAN OLD DATA
+                # ------------------------------------------------
+
                 clean_old_data(data)
+
+                # ------------------------------------------------
+                # SAVE
+                # ------------------------------------------------
+
                 save_data(data)
 
                 print(
-                    datetime.now(IST).strftime(
+                    now_ist().strftime(
                         "%Y-%m-%d %H:%M:%S"
                     ),
                     status
@@ -201,12 +257,17 @@ async def tracker():
 
             except Exception as e:
 
-                print("Tracker error:", e)
+                print(
+                    "Tracker error:",
+                    repr(e)
+                )
 
             await asyncio.sleep(CHECK_INTERVAL)
 
 
-# ---------------- START BOTH ----------------
+# ============================================================
+# START EVERYTHING
+# ============================================================
 
 if __name__ == "__main__":
 
