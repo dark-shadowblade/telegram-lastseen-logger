@@ -28,10 +28,7 @@ body {
     background:
         radial-gradient(circle at top, #182331 0%, #07090d 45%);
     color: var(--text);
-    font-family:
-        Arial,
-        "Segoe UI",
-        sans-serif;
+    font-family: Arial, "Segoe UI", sans-serif;
 }
 
 .container {
@@ -77,7 +74,6 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 20px;
-
     background: linear-gradient(135deg, #121922, #0d1117);
     border: 1px solid var(--border);
     border-radius: 18px;
@@ -179,13 +175,14 @@ select {
     padding: 15px;
     font-size: 14px;
     outline: none;
+    cursor: pointer;
 }
 
 select:focus {
     border-color: #36536f;
 }
 
-/* DAY CONTAINER */
+/* HISTORY */
 
 .history {
     margin-top: 13px;
@@ -195,7 +192,7 @@ select:focus {
     background: #0d1117;
 }
 
-/* DAY SUMMARY */
+/* DAY */
 
 .day {
     border-bottom: 1px solid #202631;
@@ -210,7 +207,6 @@ select:focus {
     grid-template-columns: 1fr auto auto;
     align-items: center;
     gap: 18px;
-
     padding: 17px 19px;
     cursor: pointer;
     transition: background .15s ease;
@@ -241,14 +237,14 @@ select:focus {
 .day-sessions {
     color: var(--muted);
     font-size: 12px;
-    min-width: 65px;
+    min-width: 75px;
     text-align: right;
 }
 
 .arrow {
     display: inline-block;
     margin-left: 7px;
-    font-size: 11px;
+    font-size: 10px;
     transition: transform .2s ease;
 }
 
@@ -256,7 +252,7 @@ select:focus {
     transform: rotate(180deg);
 }
 
-/* DETAILS INSIDE DAY */
+/* DETAILS */
 
 .day-details {
     display: none;
@@ -342,7 +338,6 @@ select:focus {
     .status-updated {
         margin-left: 27px;
     }
-
 }
 
 @media (max-width: 430px) {
@@ -360,7 +355,6 @@ select:focus {
         grid-column: 2;
         grid-row: 1;
     }
-
 }
 </style>
 </head>
@@ -403,28 +397,51 @@ select:focus {
     </div>
 
 
-    <!-- STATS -->
+    <!-- STAT CARDS -->
 
     <div class="stats">
 
         <div class="stat">
-            <div class="stat-label">Online Since</div>
-            <div id="onlineSince" class="stat-value">—</div>
+            <div class="stat-label">
+                Online Since
+            </div>
+
+            <div id="onlineSince" class="stat-value">
+                —
+            </div>
         </div>
 
-        <div class="stat">
-            <div class="stat-label">Last Seen</div>
-            <div id="lastSeen" class="stat-value">—</div>
-        </div>
 
         <div class="stat">
-            <div class="stat-label">Today Online</div>
-            <div id="todayTotal" class="stat-value">0s</div>
+            <div class="stat-label">
+                Last Seen
+            </div>
+
+            <div id="lastSeen" class="stat-value">
+                —
+            </div>
         </div>
 
+
         <div class="stat">
-            <div class="stat-label">Sessions</div>
-            <div id="sessionCount" class="stat-value">0</div>
+            <div class="stat-label">
+                Today Online
+            </div>
+
+            <div id="todayTotal" class="stat-value">
+                0s
+            </div>
+        </div>
+
+
+        <div class="stat">
+            <div class="stat-label">
+                Sessions
+            </div>
+
+            <div id="sessionCount" class="stat-value">
+                0
+            </div>
         </div>
 
     </div>
@@ -443,8 +460,6 @@ select:focus {
     </div>
 
 
-    <!-- HISTORY CONTENT -->
-
     <div id="history" class="history"></div>
 
 
@@ -457,22 +472,29 @@ select:focus {
 
 <script>
 
+/*
+==================================================
+LIVE DATA SOURCE
+==================================================
+*/
+
 const DATA_URL =
-"https://cdn.jsdelivr.net/gh/dark-shadowblade/telegram-activity-data@main/activity_7days.json";
+"https://dark-shadowblade.github.io/telegram-activity-data/activity_7days.json";
 
 const TIMEZONE = "Asia/Kolkata";
 
 let data = null;
-
 let selectedDay = "today";
 
+
+/* HELPER */
 
 function $(id) {
     return document.getElementById(id);
 }
 
 
-/* DATE */
+/* DATE FUNCTIONS */
 
 function getDayKey(date) {
 
@@ -610,7 +632,7 @@ function formatDuration(seconds) {
 }
 
 
-/* SESSIONS */
+/* GET SESSIONS FOR A DAY */
 
 function getSessions(day) {
 
@@ -629,68 +651,15 @@ function getSessions(day) {
 }
 
 
-/* TODAY TOTAL */
-
-function getTodayTotal() {
-
-    if (!data)
-        return 0;
-
-    const today =
-        getDayKey(new Date());
-
-    let total = 0;
-
-    for (const session of data.sessions || []) {
-
-        if (
-            getDayKey(
-                new Date(session.start)
-            ) === today
-        ) {
-
-            total +=
-                sessionDuration(session);
-
-        }
-
-    }
-
-
-    /* CURRENT ONLINE */
-
-    if (data.current_online_since) {
-
-        if (
-            getDayKey(
-                new Date(
-                    data.current_online_since
-                )
-            ) === today
-        ) {
-
-            total +=
-                (
-                    Date.now() -
-                    new Date(
-                        data.current_online_since
-                    ).getTime()
-                ) / 1000;
-
-        }
-
-    }
-
-    return total;
-
-}
-
-
 /* DAY TOTAL */
 
 function getDayTotal(day) {
 
+    if (!data)
+        return 0;
+
     let total = 0;
+
 
     for (
         const session
@@ -702,6 +671,8 @@ function getDayTotal(day) {
 
     }
 
+
+    /* CURRENT ONLINE SESSION */
 
     if (data.current_online_since) {
 
@@ -725,7 +696,19 @@ function getDayTotal(day) {
 
     }
 
+
     return total;
+
+}
+
+
+/* TODAY TOTAL */
+
+function getTodayTotal() {
+
+    return getDayTotal(
+        getDayKey(new Date())
+    );
 
 }
 
@@ -736,6 +719,7 @@ function renderTop() {
 
     if (!data)
         return;
+
 
     const status =
         data.last_status ||
@@ -821,6 +805,8 @@ function populateSelector() {
         getDayKey(new Date());
 
 
+    /* TODAY */
+
     const todayOption =
         document.createElement("option");
 
@@ -836,12 +822,18 @@ function populateSelector() {
     );
 
 
+    /* OTHER DAYS */
+
     getLast7Days()
-        .filter(day => day !== today)
+        .filter(
+            day => day !== today
+        )
         .forEach(day => {
 
             const option =
-                document.createElement("option");
+                document.createElement(
+                    "option"
+                );
 
             option.value =
                 day;
@@ -856,8 +848,12 @@ function populateSelector() {
         });
 
 
+    /* ALL 7 DAYS */
+
     const all =
-        document.createElement("option");
+        document.createElement(
+            "option"
+        );
 
     all.value =
         "all";
@@ -874,215 +870,7 @@ function populateSelector() {
 }
 
 
-/* INDIVIDUAL DAY */
-
-function renderSingleDay(day) {
-
-    const history =
-        $("history");
-
-    history.innerHTML = "";
-
-
-    const sessions =
-        getSessions(day);
-
-
-    const wrapper =
-        document.createElement("div");
-
-    wrapper.className =
-        "day";
-
-
-    const summary =
-        document.createElement("div");
-
-    summary.className =
-        "day-summary";
-
-
-    summary.innerHTML = `
-
-        <div>
-            <div class="day-name">
-                ${day === getDayKey(new Date())
-                    ? "Today"
-                    : formatDay(day)}
-            </div>
-
-            <div class="day-date">
-                ${formatDay(day)}
-            </div>
-        </div>
-
-        <div class="day-total">
-            ${formatDuration(
-                getDayTotal(day)
-            )}
-        </div>
-
-        <div class="day-sessions">
-            ${sessions.length}
-            ${sessions.length === 1
-                ? "session"
-                : "sessions"}
-        </div>
-
-    `;
-
-
-    const details =
-        document.createElement("div");
-
-    details.className =
-        "day-details";
-
-
-    renderSessions(
-        details,
-        sessions
-    );
-
-
-    wrapper.appendChild(
-        summary
-    );
-
-    wrapper.appendChild(
-        details
-    );
-
-    history.appendChild(
-        wrapper
-    );
-
-
-    /* TODAY IS OPEN BY DEFAULT */
-
-    wrapper.classList.add("open");
-
-}
-
-
-/* ALL 7 DAYS */
-
-function renderAllDays() {
-
-    const history =
-        $("history");
-
-    history.innerHTML = "";
-
-
-    getLast7Days().forEach(day => {
-
-        const sessions =
-            getSessions(day);
-
-
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className =
-            "day";
-
-
-        const summary =
-            document.createElement("div");
-
-        summary.className =
-            "day-summary";
-
-
-        summary.innerHTML = `
-
-            <div>
-
-                <div class="day-name">
-
-                    ${
-                        day ===
-                        getDayKey(new Date())
-                        ? "Today"
-                        : formatDay(day)
-                    }
-
-                </div>
-
-                <div class="day-date">
-                    ${formatDay(day)}
-                </div>
-
-            </div>
-
-            <div class="day-total">
-
-                ${formatDuration(
-                    getDayTotal(day)
-                )}
-
-            </div>
-
-            <div class="day-sessions">
-
-                ${sessions.length}
-                ${sessions.length === 1
-                    ? "session"
-                    : "sessions"}
-
-                <span class="arrow">
-                    ▼
-                </span>
-
-            </div>
-
-        `;
-
-
-        const details =
-            document.createElement("div");
-
-        details.className =
-            "day-details";
-
-
-        renderSessions(
-            details,
-            sessions
-        );
-
-
-        summary.addEventListener(
-            "click",
-            () => {
-
-                wrapper.classList.toggle(
-                    "open"
-                );
-
-            }
-        );
-
-
-        wrapper.appendChild(
-            summary
-        );
-
-        wrapper.appendChild(
-            details
-        );
-
-        history.appendChild(
-            wrapper
-        );
-
-    });
-
-}
-
-
-/* RENDER SESSION DETAILS */
+/* CREATE SESSION HTML */
 
 function renderSessions(
     container,
@@ -1092,7 +880,9 @@ function renderSessions(
     if (!sessions.length) {
 
         const empty =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         empty.className =
             "empty";
@@ -1115,7 +905,9 @@ function renderSessions(
         .forEach(session => {
 
             const div =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             div.className =
                 "session";
@@ -1180,7 +972,256 @@ function renderSessions(
 }
 
 
-/* MAIN HISTORY */
+/* SINGLE DAY */
+
+function renderSingleDay(day) {
+
+    const history =
+        $("history");
+
+    history.innerHTML = "";
+
+
+    const sessions =
+        getSessions(day);
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+    wrapper.className =
+        "day";
+
+
+    const summary =
+        document.createElement(
+            "div"
+        );
+
+    summary.className =
+        "day-summary";
+
+
+    summary.innerHTML = `
+
+        <div>
+
+            <div class="day-name">
+
+                ${
+                    day ===
+                    getDayKey(new Date())
+                    ? "Today"
+                    : formatDay(day)
+                }
+
+            </div>
+
+            <div class="day-date">
+
+                ${formatDay(day)}
+
+            </div>
+
+        </div>
+
+
+        <div class="day-total">
+
+            ${formatDuration(
+                getDayTotal(day)
+            )}
+
+        </div>
+
+
+        <div class="day-sessions">
+
+            ${sessions.length}
+            ${
+                sessions.length === 1
+                ? "session"
+                : "sessions"
+            }
+
+        </div>
+
+    `;
+
+
+    const details =
+        document.createElement(
+            "div"
+        );
+
+    details.className =
+        "day-details";
+
+
+    renderSessions(
+        details,
+        sessions
+    );
+
+
+    wrapper.appendChild(
+        summary
+    );
+
+    wrapper.appendChild(
+        details
+    );
+
+    history.appendChild(
+        wrapper
+    );
+
+
+    /* OPEN SELECTED DAY */
+
+    wrapper.classList.add(
+        "open"
+    );
+
+}
+
+
+/* ALL DAYS */
+
+function renderAllDays() {
+
+    const history =
+        $("history");
+
+    history.innerHTML = "";
+
+
+    getLast7Days()
+        .forEach(day => {
+
+            const sessions =
+                getSessions(day);
+
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+            wrapper.className =
+                "day";
+
+
+            const summary =
+                document.createElement(
+                    "div"
+                );
+
+            summary.className =
+                "day-summary";
+
+
+            summary.innerHTML = `
+
+                <div>
+
+                    <div class="day-name">
+
+                        ${
+                            day ===
+                            getDayKey(new Date())
+                            ? "Today"
+                            : formatDay(day)
+                        }
+
+                    </div>
+
+                    <div class="day-date">
+
+                        ${formatDay(day)}
+
+                    </div>
+
+                </div>
+
+
+                <div class="day-total">
+
+                    ${formatDuration(
+                        getDayTotal(day)
+                    )}
+
+                </div>
+
+
+                <div class="day-sessions">
+
+                    ${sessions.length}
+
+                    ${
+                        sessions.length === 1
+                        ? "session"
+                        : "sessions"
+                    }
+
+                    <span class="arrow">
+                        ▼
+                    </span>
+
+                </div>
+
+            `;
+
+
+            const details =
+                document.createElement(
+                    "div"
+                );
+
+            details.className =
+                "day-details";
+
+
+            renderSessions(
+                details,
+                sessions
+            );
+
+
+            /* ONLY CLICKED DAY OPENS */
+
+            summary.addEventListener(
+                "click",
+                () => {
+
+                    wrapper.classList.toggle(
+                        "open"
+                    );
+
+                }
+            );
+
+
+            wrapper.appendChild(
+                summary
+            );
+
+            wrapper.appendChild(
+                details
+            );
+
+            history.appendChild(
+                wrapper
+            );
+
+        });
+
+}
+
+
+/* HISTORY */
 
 function renderHistory() {
 
@@ -1188,7 +1229,9 @@ function renderHistory() {
         return;
 
 
-    if (selectedDay === "all") {
+    if (
+        selectedDay === "all"
+    ) {
 
         renderAllDays();
 
@@ -1208,7 +1251,7 @@ function renderHistory() {
 }
 
 
-/* MAIN RENDER */
+/* RENDER EVERYTHING */
 
 function render() {
 
@@ -1219,7 +1262,7 @@ function render() {
 }
 
 
-/* LOAD DATA */
+/* LOAD JSON */
 
 async function loadData() {
 
@@ -1279,7 +1322,7 @@ async function loadData() {
 }
 
 
-/* SELECT CHANGE */
+/* SELECTOR CHANGE */
 
 $("daySelect").addEventListener(
     "change",
@@ -1294,14 +1337,14 @@ $("daySelect").addEventListener(
 );
 
 
-/* START */
+/* INITIALIZE */
 
 populateSelector();
 
 loadData();
 
 
-/* REFRESH DATA EVERY 60 SEC */
+/* REFRESH FROM GITHUB EVERY 60 SEC */
 
 setInterval(
     loadData,
@@ -1309,7 +1352,7 @@ setInterval(
 );
 
 
-/* UPDATE LIVE DURATION EVERY SECOND */
+/* UPDATE LIVE ONLINE DURATION */
 
 setInterval(
     () => {
