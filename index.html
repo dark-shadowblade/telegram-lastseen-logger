@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Telegram Activity</title>
 
 <style>
@@ -14,51 +13,47 @@
 :root {
     --bg: #07090d;
     --card: #10141b;
-    --card2: #0c1016;
-    --border: #202733;
-    --text: #f3f5f7;
-    --muted: #89919e;
-    --accent: #2ea6ff;
-    --green: #25e27a;
-    --red: #ff4d5a;
+    --card-hover: #151b23;
+    --border: #222a35;
+    --text: #f2f4f7;
+    --muted: #8993a1;
+    --blue: #2ea6ff;
+    --green: #27e27b;
+    --red: #ff4f5c;
 }
 
 body {
     margin: 0;
     min-height: 100vh;
     background:
-        radial-gradient(circle at top, #17202c 0%, #07090d 45%);
+        radial-gradient(circle at top, #182331 0%, #07090d 45%);
     color: var(--text);
     font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
         Arial,
+        "Segoe UI",
         sans-serif;
 }
 
 .container {
-    width: min(1050px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 45px 0 60px;
+    width: min(1000px, calc(100% - 28px));
+    margin: auto;
+    padding: 38px 0 60px;
 }
 
 /* HEADER */
 
 .header {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .header h1 {
     margin: 0;
-    font-size: clamp(30px, 5vw, 44px);
-    font-weight: 750;
-    letter-spacing: -1.5px;
+    font-size: 38px;
+    letter-spacing: -1px;
 }
 
 .header p {
-    margin: 8px 0 0;
+    margin: 7px 0 0;
     color: var(--muted);
     font-size: 14px;
 }
@@ -67,266 +62,276 @@ body {
 
 .error {
     display: none;
-    padding: 14px 16px;
-    margin-bottom: 20px;
+    background: rgba(255, 79, 92, .12);
+    border: 1px solid rgba(255, 79, 92, .35);
+    color: #ff858d;
+    padding: 13px 15px;
     border-radius: 12px;
-    background: rgba(255, 77, 90, 0.1);
-    border: 1px solid rgba(255, 77, 90, 0.35);
-    color: #ff7c86;
+    margin-bottom: 18px;
 }
 
-/* MAIN STATUS */
+/* CURRENT STATUS */
 
 .status-card {
-    background:
-        linear-gradient(135deg, #121821, #0d1117);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 18px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     gap: 20px;
+
+    background: linear-gradient(135deg, #121922, #0d1117);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 15px;
 }
 
 .status-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 14px;
 }
 
 .status-dot {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
     background: #777;
-    box-shadow: 0 0 0 5px rgba(120,120,120,.08);
 }
 
 .status-dot.online {
     background: var(--green);
-    box-shadow:
-        0 0 0 5px rgba(37,226,122,.10),
-        0 0 18px rgba(37,226,122,.55);
+    box-shadow: 0 0 16px rgba(39,226,123,.7);
 }
 
 .status-dot.offline {
     background: var(--red);
-    box-shadow: 0 0 0 5px rgba(255,77,90,.08);
+    box-shadow: 0 0 12px rgba(255,79,92,.35);
 }
 
-.status-title {
+.status-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .status-value {
-    margin-top: 4px;
     font-size: 24px;
-    font-weight: 750;
+    font-weight: 700;
+    margin-top: 3px;
 }
 
-.status-time {
-    text-align: right;
+.status-updated {
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
 }
 
-/* STAT GRID */
+/* STATS */
 
 .stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin-bottom: 35px;
+    gap: 12px;
+    margin-bottom: 32px;
 }
 
-.card {
-    background: rgba(16,20,27,.9);
+.stat {
+    background: rgba(16,20,27,.95);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 19px;
-    min-height: 105px;
+    border-radius: 15px;
+    padding: 17px;
 }
 
-.card-label {
+.stat-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: .7px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
-.card-value {
-    font-size: 19px;
+.stat-value {
+    font-size: 17px;
     font-weight: 700;
     line-height: 1.35;
-    word-break: break-word;
 }
 
-/* SECTIONS */
+/* SECTION */
 
 .section {
-    margin-top: 30px;
+    margin-top: 27px;
 }
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-.section h2 {
-    margin: 0;
+.section-title {
     font-size: 20px;
-    letter-spacing: -.3px;
+    font-weight: 700;
+    margin-bottom: 13px;
 }
 
-/* DAY SELECT */
+/* SELECTOR */
 
 select {
     width: 100%;
-    appearance: none;
-    background:
-        linear-gradient(45deg, transparent 50%, #aaa 50%) calc(100% - 20px) 50% / 6px 6px no-repeat,
-        linear-gradient(135deg, #aaa 50%, transparent 50%) calc(100% - 15px) 50% / 6px 6px no-repeat,
-        #10141b;
-
+    background: #10141b;
     color: white;
     border: 1px solid var(--border);
     border-radius: 13px;
-    padding: 15px 45px 15px 16px;
+    padding: 15px;
     font-size: 14px;
     outline: none;
-    cursor: pointer;
 }
 
 select:focus {
-    border-color: #36516d;
+    border-color: #36536f;
 }
 
-/* 7 DAY SUMMARY */
+/* DAY CONTAINER */
 
-.summary-list {
-    background: #0d1117;
+.history {
+    margin-top: 13px;
     border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
+    background: #0d1117;
 }
 
-.day-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: 20px;
-    padding: 17px 19px;
-    border-bottom: 1px solid #1b212b;
+/* DAY SUMMARY */
+
+.day {
+    border-bottom: 1px solid #202631;
 }
 
-.day-row:last-child {
+.day:last-child {
     border-bottom: none;
 }
 
+.day-summary {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 18px;
+
+    padding: 17px 19px;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.day-summary:hover {
+    background: var(--card-hover);
+}
+
 .day-name {
-    font-weight: 650;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .day-date {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     margin-top: 4px;
 }
 
-.day-duration {
-    font-weight: 650;
+.day-total {
+    color: var(--blue);
+    font-weight: 700;
+    font-size: 13px;
     text-align: right;
 }
 
 .day-sessions {
     color: var(--muted);
     font-size: 12px;
-    min-width: 70px;
+    min-width: 65px;
     text-align: right;
 }
 
-/* DETAILS */
-
-.details-box {
-    background: #0d1117;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
+.arrow {
+    display: inline-block;
+    margin-left: 7px;
+    font-size: 11px;
+    transition: transform .2s ease;
 }
 
-.details-header {
-    padding: 17px 19px;
-    border-bottom: 1px solid #1b212b;
-    font-weight: 700;
+.day.open .arrow {
+    transform: rotate(180deg);
+}
+
+/* DETAILS INSIDE DAY */
+
+.day-details {
+    display: none;
+    padding: 0 19px 18px;
+    background: #0a0e13;
+}
+
+.day.open .day-details {
+    display: block;
 }
 
 .session {
-    padding: 18px 19px;
-    border-bottom: 1px solid #1b212b;
+    padding: 14px 0;
+    border-top: 1px solid #1c232d;
 }
 
-.session:last-child {
-    border-bottom: none;
+.session:first-child {
+    border-top: none;
+}
+
+.session-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
 }
 
 .session-time {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 9px;
-}
-
-.session-start {
-    font-weight: 650;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .session-duration {
-    color: var(--accent);
-    font-weight: 650;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .session-end {
     color: var(--muted);
-    font-size: 13px;
+    font-size: 11px;
+    margin-top: 5px;
 }
 
-/* EMPTY */
-
 .empty {
-    padding: 28px 20px;
+    padding: 23px 18px;
     text-align: center;
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 /* FOOTER */
 
 .footer {
     text-align: center;
-    margin-top: 40px;
-    color: #606975;
-    font-size: 12px;
+    color: #59616d;
+    font-size: 11px;
+    margin-top: 35px;
 }
 
 /* MOBILE */
 
-@media (max-width: 750px) {
+@media (max-width: 700px) {
 
     .container {
-        width: min(100% - 20px, 600px);
-        padding-top: 28px;
+        width: calc(100% - 18px);
+        padding-top: 25px;
+    }
+
+    .header h1 {
+        font-size: 30px;
     }
 
     .stats {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr;
     }
 
     .status-card {
@@ -334,42 +339,26 @@ select:focus {
         flex-direction: column;
     }
 
-    .status-time {
-        text-align: left;
+    .status-updated {
+        margin-left: 27px;
     }
 
 }
 
-@media (max-width: 480px) {
+@media (max-width: 430px) {
 
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 9px;
-    }
-
-    .card {
-        padding: 15px;
-        min-height: 95px;
-    }
-
-    .card-value {
-        font-size: 16px;
-    }
-
-    .day-row {
+    .day-summary {
         grid-template-columns: 1fr auto;
-        gap: 8px;
+        gap: 7px;
+    }
+
+    .day-total {
+        text-align: left;
     }
 
     .day-sessions {
         grid-column: 2;
         grid-row: 1;
-    }
-
-    .day-duration {
-        grid-column: 1;
-        text-align: left;
-        color: var(--accent);
     }
 
 }
@@ -396,7 +385,10 @@ select:focus {
             <div id="statusDot" class="status-dot"></div>
 
             <div>
-                <div class="status-title">Current Status</div>
+                <div class="status-label">
+                    Current Status
+                </div>
+
                 <div id="status" class="status-value">
                     Loading...
                 </div>
@@ -404,7 +396,7 @@ select:focus {
 
         </div>
 
-        <div id="updatedAt" class="status-time">
+        <div id="updatedAt" class="status-updated">
             Updating...
         </div>
 
@@ -415,24 +407,24 @@ select:focus {
 
     <div class="stats">
 
-        <div class="card">
-            <div class="card-label">Online Since</div>
-            <div id="onlineSince" class="card-value">—</div>
+        <div class="stat">
+            <div class="stat-label">Online Since</div>
+            <div id="onlineSince" class="stat-value">—</div>
         </div>
 
-        <div class="card">
-            <div class="card-label">Last Seen</div>
-            <div id="lastSeen" class="card-value">—</div>
+        <div class="stat">
+            <div class="stat-label">Last Seen</div>
+            <div id="lastSeen" class="stat-value">—</div>
         </div>
 
-        <div class="card">
-            <div class="card-label">Today Online</div>
-            <div id="todayTotal" class="card-value">0s</div>
+        <div class="stat">
+            <div class="stat-label">Today Online</div>
+            <div id="todayTotal" class="stat-value">0s</div>
         </div>
 
-        <div class="card">
-            <div class="card-label">Sessions</div>
-            <div id="sessionCount" class="card-value">0</div>
+        <div class="stat">
+            <div class="stat-label">Sessions</div>
+            <div id="sessionCount" class="stat-value">0</div>
         </div>
 
     </div>
@@ -442,37 +434,18 @@ select:focus {
 
     <div class="section">
 
-        <div class="section-header">
-            <h2>Activity History</h2>
+        <div class="section-title">
+            Activity History
         </div>
 
-        <select id="daySelect">
-            <option value="all">All 7 Days</option>
-        </select>
+        <select id="daySelect"></select>
 
     </div>
 
 
-    <!-- SUMMARY -->
+    <!-- HISTORY CONTENT -->
 
-    <div class="section">
-
-        <div id="summary" class="summary-list"></div>
-
-    </div>
-
-
-    <!-- DETAILS -->
-
-    <div class="section">
-
-        <div class="section-header">
-            <h2>Day Details</h2>
-        </div>
-
-        <div id="details" class="details-box"></div>
-
-    </div>
+    <div id="history" class="history"></div>
 
 
     <div class="footer">
@@ -490,11 +463,23 @@ const DATA_URL =
 const TIMEZONE = "Asia/Kolkata";
 
 let data = null;
-let selectedDay = "all";
+
+let selectedDay = "today";
 
 
 function $(id) {
     return document.getElementById(id);
+}
+
+
+/* DATE */
+
+function getDayKey(date) {
+
+    return new Intl.DateTimeFormat("en-CA", {
+        timeZone: TIMEZONE
+    }).format(date);
+
 }
 
 
@@ -511,9 +496,23 @@ function formatDateTime(iso) {
 }
 
 
-function formatShortDate(day) {
+function formatTime(iso) {
 
-    const d = new Date(day + "T00:00:00");
+    if (!iso) return "—";
+
+    return new Intl.DateTimeFormat("en-IN", {
+        timeZone: TIMEZONE,
+        hour: "numeric",
+        minute: "2-digit"
+    }).format(new Date(iso));
+
+}
+
+
+function formatDay(day) {
+
+    const d =
+        new Date(day + "T00:00:00");
 
     return new Intl.DateTimeFormat("en-IN", {
         day: "2-digit",
@@ -524,18 +523,9 @@ function formatShortDate(day) {
 }
 
 
-function getDayKey(date) {
-
-    return new Intl.DateTimeFormat("en-CA", {
-        timeZone: TIMEZONE
-    }).format(date);
-
-}
-
-
 function getLast7Days() {
 
-    const result = [];
+    const days = [];
 
     const now = new Date();
 
@@ -543,49 +533,30 @@ function getLast7Days() {
 
         const d = new Date(now);
 
-        d.setDate(d.getDate() - i);
+        d.setDate(
+            d.getDate() - i
+        );
 
-        result.push(getDayKey(d));
+        days.push(
+            getDayKey(d)
+        );
 
     }
 
-    return result;
+    return days;
 
 }
 
 
-function formatDuration(seconds) {
-
-    seconds = Math.max(0, Math.floor(seconds));
-
-    const days = Math.floor(seconds / 86400);
-    seconds %= 86400;
-
-    const hours = Math.floor(seconds / 3600);
-    seconds %= 3600;
-
-    const minutes = Math.floor(seconds / 60);
-    seconds %= 60;
-
-    const parts = [];
-
-    if (days) parts.push(days + "d");
-    if (hours) parts.push(hours + "h");
-    if (minutes) parts.push(minutes + "m");
-
-    if (!parts.length || seconds) {
-        parts.push(seconds + "s");
-    }
-
-    return parts.join(" ");
-}
-
+/* DURATION */
 
 function sessionDuration(session) {
 
-    const start = new Date(session.start);
+    const start =
+        new Date(session.start);
 
-    const end = session.end
+    const end =
+        session.end
         ? new Date(session.end)
         : new Date();
 
@@ -597,11 +568,76 @@ function sessionDuration(session) {
 }
 
 
+function formatDuration(seconds) {
+
+    seconds =
+        Math.max(
+            0,
+            Math.floor(seconds)
+        );
+
+    const days =
+        Math.floor(seconds / 86400);
+
+    seconds %= 86400;
+
+    const hours =
+        Math.floor(seconds / 3600);
+
+    seconds %= 3600;
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    seconds %= 60;
+
+    const parts = [];
+
+    if (days)
+        parts.push(days + "d");
+
+    if (hours)
+        parts.push(hours + "h");
+
+    if (minutes)
+        parts.push(minutes + "m");
+
+    if (!parts.length || seconds)
+        parts.push(seconds + "s");
+
+    return parts.join(" ");
+
+}
+
+
+/* SESSIONS */
+
+function getSessions(day) {
+
+    if (!data)
+        return [];
+
+    return (data.sessions || [])
+        .filter(session => {
+
+            return getDayKey(
+                new Date(session.start)
+            ) === day;
+
+        });
+
+}
+
+
+/* TODAY TOTAL */
+
 function getTodayTotal() {
 
-    if (!data) return 0;
+    if (!data)
+        return 0;
 
-    const today = getDayKey(new Date());
+    const today =
+        getDayKey(new Date());
 
     let total = 0;
 
@@ -613,25 +649,33 @@ function getTodayTotal() {
             ) === today
         ) {
 
-            total += sessionDuration(session);
+            total +=
+                sessionDuration(session);
 
         }
 
     }
 
+
+    /* CURRENT ONLINE */
+
     if (data.current_online_since) {
 
         if (
             getDayKey(
-                new Date(data.current_online_since)
+                new Date(
+                    data.current_online_since
+                )
             ) === today
         ) {
 
             total +=
-                (Date.now() -
-                new Date(
-                    data.current_online_since
-                ).getTime()) / 1000;
+                (
+                    Date.now() -
+                    new Date(
+                        data.current_online_since
+                    ).getTime()
+                ) / 1000;
 
         }
 
@@ -642,45 +686,76 @@ function getTodayTotal() {
 }
 
 
-function populateDays() {
+/* DAY TOTAL */
 
-    const select = $("daySelect");
+function getDayTotal(day) {
 
-    select.innerHTML =
-        '<option value="all">All 7 Days</option>';
+    let total = 0;
 
-    getLast7Days().forEach(day => {
+    for (
+        const session
+        of getSessions(day)
+    ) {
 
-        const option =
-            document.createElement("option");
+        total +=
+            sessionDuration(session);
 
-        option.value = day;
+    }
 
-        option.textContent =
-            formatShortDate(day);
 
-        select.appendChild(option);
+    if (data.current_online_since) {
 
-    });
+        if (
+            getDayKey(
+                new Date(
+                    data.current_online_since
+                )
+            ) === day
+        ) {
+
+            total +=
+                (
+                    Date.now() -
+                    new Date(
+                        data.current_online_since
+                    ).getTime()
+                ) / 1000;
+
+        }
+
+    }
+
+    return total;
 
 }
 
 
+/* TOP STATUS */
+
 function renderTop() {
 
-    if (!data) return;
+    if (!data)
+        return;
 
     const status =
         data.last_status ||
-        (data.current_online_since
+        (
+            data.current_online_since
             ? "ONLINE"
-            : "OFFLINE");
+            : "OFFLINE"
+        );
 
-    $("status").textContent = status;
 
-    const dot = $("statusDot");
+    $("status").textContent =
+        status;
 
-    dot.className = "status-dot";
+
+    const dot =
+        $("statusDot");
+
+    dot.className =
+        "status-dot";
+
 
     if (status === "ONLINE") {
 
@@ -695,16 +770,18 @@ function renderTop() {
 
     $("onlineSince").textContent =
         data.current_online_since
-            ? formatDateTime(
-                data.current_online_since
-              )
-            : "—";
+        ? formatDateTime(
+            data.current_online_since
+          )
+        : "—";
 
 
     $("lastSeen").textContent =
         data.last_seen
-            ? formatDateTime(data.last_seen)
-            : "—";
+        ? formatDateTime(
+            data.last_seen
+          )
+        : "—";
 
 
     $("todayTotal").textContent =
@@ -714,141 +791,318 @@ function renderTop() {
 
 
     $("sessionCount").textContent =
-        (data.sessions || []).length;
+        (
+            data.sessions || []
+        ).length;
 
 
     $("updatedAt").textContent =
         data.updated_at
-            ? "Updated " +
-              formatDateTime(data.updated_at)
-            : "Waiting for update";
+        ? "Updated " +
+          formatDateTime(
+              data.updated_at
+          )
+        : "Waiting for update";
 
 }
 
 
-function getDayStats(day) {
+/* SELECTOR */
 
-    let total = 0;
-    let count = 0;
+function populateSelector() {
 
-    for (const session of data.sessions || []) {
+    const select =
+        $("daySelect");
 
-        if (
-            getDayKey(
-                new Date(session.start)
-            ) === day
-        ) {
+    select.innerHTML = "";
 
-            total += sessionDuration(session);
-            count++;
 
-        }
+    const today =
+        getDayKey(new Date());
 
-    }
 
-    return {
-        total,
-        count
-    };
+    const todayOption =
+        document.createElement("option");
+
+    todayOption.value =
+        "today";
+
+    todayOption.textContent =
+        "Today — " +
+        formatDay(today);
+
+    select.appendChild(
+        todayOption
+    );
+
+
+    getLast7Days()
+        .filter(day => day !== today)
+        .forEach(day => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                day;
+
+            option.textContent =
+                formatDay(day);
+
+            select.appendChild(
+                option
+            );
+
+        });
+
+
+    const all =
+        document.createElement("option");
+
+    all.value =
+        "all";
+
+    all.textContent =
+        "All 7 Days";
+
+    select.appendChild(all);
+
+
+    select.value =
+        selectedDay;
 
 }
 
 
-function renderSummary() {
+/* INDIVIDUAL DAY */
 
-    const container = $("summary");
+function renderSingleDay(day) {
 
-    container.innerHTML = "";
+    const history =
+        $("history");
+
+    history.innerHTML = "";
+
+
+    const sessions =
+        getSessions(day);
+
+
+    const wrapper =
+        document.createElement("div");
+
+    wrapper.className =
+        "day";
+
+
+    const summary =
+        document.createElement("div");
+
+    summary.className =
+        "day-summary";
+
+
+    summary.innerHTML = `
+
+        <div>
+            <div class="day-name">
+                ${day === getDayKey(new Date())
+                    ? "Today"
+                    : formatDay(day)}
+            </div>
+
+            <div class="day-date">
+                ${formatDay(day)}
+            </div>
+        </div>
+
+        <div class="day-total">
+            ${formatDuration(
+                getDayTotal(day)
+            )}
+        </div>
+
+        <div class="day-sessions">
+            ${sessions.length}
+            ${sessions.length === 1
+                ? "session"
+                : "sessions"}
+        </div>
+
+    `;
+
+
+    const details =
+        document.createElement("div");
+
+    details.className =
+        "day-details";
+
+
+    renderSessions(
+        details,
+        sessions
+    );
+
+
+    wrapper.appendChild(
+        summary
+    );
+
+    wrapper.appendChild(
+        details
+    );
+
+    history.appendChild(
+        wrapper
+    );
+
+
+    /* TODAY IS OPEN BY DEFAULT */
+
+    wrapper.classList.add("open");
+
+}
+
+
+/* ALL 7 DAYS */
+
+function renderAllDays() {
+
+    const history =
+        $("history");
+
+    history.innerHTML = "";
+
 
     getLast7Days().forEach(day => {
 
-        const stats =
-            getDayStats(day);
+        const sessions =
+            getSessions(day);
 
-        const row =
+
+        const wrapper =
             document.createElement("div");
 
-        row.className = "day-row";
+        wrapper.className =
+            "day";
 
-        row.innerHTML = `
+
+        const summary =
+            document.createElement("div");
+
+        summary.className =
+            "day-summary";
+
+
+        summary.innerHTML = `
+
             <div>
+
                 <div class="day-name">
-                    ${day}
+
+                    ${
+                        day ===
+                        getDayKey(new Date())
+                        ? "Today"
+                        : formatDay(day)
+                    }
+
                 </div>
+
                 <div class="day-date">
-                    ${formatShortDate(day)}
+                    ${formatDay(day)}
                 </div>
+
             </div>
 
-            <div class="day-duration">
-                ${formatDuration(stats.total)}
+            <div class="day-total">
+
+                ${formatDuration(
+                    getDayTotal(day)
+                )}
+
             </div>
 
             <div class="day-sessions">
-                ${stats.count}
-                ${stats.count === 1 ? "session" : "sessions"}
+
+                ${sessions.length}
+                ${sessions.length === 1
+                    ? "session"
+                    : "sessions"}
+
+                <span class="arrow">
+                    ▼
+                </span>
+
             </div>
+
         `;
 
-        container.appendChild(row);
+
+        const details =
+            document.createElement("div");
+
+        details.className =
+            "day-details";
+
+
+        renderSessions(
+            details,
+            sessions
+        );
+
+
+        summary.addEventListener(
+            "click",
+            () => {
+
+                wrapper.classList.toggle(
+                    "open"
+                );
+
+            }
+        );
+
+
+        wrapper.appendChild(
+            summary
+        );
+
+        wrapper.appendChild(
+            details
+        );
+
+        history.appendChild(
+            wrapper
+        );
 
     });
 
 }
 
 
-function renderDetails() {
+/* RENDER SESSION DETAILS */
 
-    const container = $("details");
-
-    container.innerHTML = "";
-
-    let sessions =
-        data.sessions || [];
-
-
-    if (selectedDay !== "all") {
-
-        sessions = sessions.filter(
-            session =>
-                getDayKey(
-                    new Date(session.start)
-                ) === selectedDay
-        );
-
-    }
-
-
-    const title =
-        selectedDay === "all"
-            ? "All recorded sessions"
-            : formatShortDate(selectedDay);
-
-
-    const header =
-        document.createElement("div");
-
-    header.className =
-        "details-header";
-
-    header.textContent = title;
-
-    container.appendChild(header);
-
+function renderSessions(
+    container,
+    sessions
+) {
 
     if (!sessions.length) {
 
         const empty =
             document.createElement("div");
 
-        empty.className = "empty";
+        empty.className =
+            "empty";
 
         empty.textContent =
-            selectedDay === "all"
-                ? "No recorded sessions yet."
-                : "No sessions recorded on this day.";
+            "No sessions recorded.";
 
-        container.appendChild(empty);
+        container.appendChild(
+            empty
+        );
 
         return;
 
@@ -863,52 +1117,109 @@ function renderDetails() {
             const div =
                 document.createElement("div");
 
-            div.className = "session";
+            div.className =
+                "session";
+
 
             div.innerHTML = `
 
-                <div class="session-time">
+                <div class="session-main">
 
-                    <div class="session-start">
-                        ${formatDateTime(session.start)}
+                    <div class="session-time">
+
+                        ${formatTime(
+                            session.start
+                        )}
+
+                        →
+
+                        ${
+                            session.end
+                            ? formatTime(
+                                session.end
+                              )
+                            : "Now"
+                        }
+
                     </div>
 
                     <div class="session-duration">
+
                         ${formatDuration(
-                            sessionDuration(session)
+                            sessionDuration(
+                                session
+                            )
                         )}
+
                     </div>
 
                 </div>
 
                 <div class="session-end">
-                    End:
+
                     ${
                         session.end
-                            ? formatDateTime(session.end)
-                            : "Currently online"
+                        ? "Ended " +
+                          formatDateTime(
+                              session.end
+                          )
+                        : "Currently online"
                     }
+
                 </div>
 
             `;
 
-            container.appendChild(div);
+
+            container.appendChild(
+                div
+            );
 
         });
 
 }
 
 
-function render() {
+/* MAIN HISTORY */
 
-    if (!data) return;
+function renderHistory() {
 
-    renderTop();
-    renderSummary();
-    renderDetails();
+    if (!data)
+        return;
+
+
+    if (selectedDay === "all") {
+
+        renderAllDays();
+
+        return;
+
+    }
+
+
+    const day =
+        selectedDay === "today"
+        ? getDayKey(new Date())
+        : selectedDay;
+
+
+    renderSingleDay(day);
 
 }
 
+
+/* MAIN RENDER */
+
+function render() {
+
+    renderTop();
+
+    renderHistory();
+
+}
+
+
+/* LOAD DATA */
 
 async function loadData() {
 
@@ -924,19 +1235,24 @@ async function loadData() {
                 }
             );
 
+
         if (!response.ok) {
 
             throw new Error(
-                "HTTP " + response.status
+                "HTTP " +
+                response.status
             );
 
         }
 
+
         data =
             await response.json();
 
+
         $("error").style.display =
             "none";
+
 
         render();
 
@@ -945,12 +1261,15 @@ async function loadData() {
 
         console.error(error);
 
+
         $("error").style.display =
             "block";
+
 
         $("error").textContent =
             "Unable to load activity data: " +
             error.message;
+
 
         $("status").textContent =
             "Data Error";
@@ -960,33 +1279,53 @@ async function loadData() {
 }
 
 
+/* SELECT CHANGE */
+
 $("daySelect").addEventListener(
     "change",
-    function () {
+    function() {
 
         selectedDay =
             this.value;
 
-        renderDetails();
+        renderHistory();
 
     }
 );
 
 
-populateDays();
+/* START */
+
+populateSelector();
 
 loadData();
+
+
+/* REFRESH DATA EVERY 60 SEC */
 
 setInterval(
     loadData,
     60000
 );
 
+
+/* UPDATE LIVE DURATION EVERY SECOND */
+
 setInterval(
     () => {
 
         if (data) {
+
             renderTop();
+
+            if (
+                selectedDay !== "all"
+            ) {
+
+                renderHistory();
+
+            }
+
         }
 
     },
