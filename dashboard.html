@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram Activity Dashboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #08090d;
+    color: #f5f5f5;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+.card {
+    background: #11131a;
+    border: 1px solid #242733;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.live {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.status {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.online {
+    color: #35e27b;
+}
+
+.offline {
+    color: #aaa;
+}
+
+.label {
+    color: #8e93a3;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.value {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #181b24;
+    border-radius: 14px;
+    padding: 15px;
+}
+
+select {
+    width: 100%;
+    padding: 14px;
+    background: #181b24;
+    color: white;
+    border: 1px solid #303442;
+    border-radius: 12px;
+    font-size: 16px;
+}
+
+.session {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #242733;
+}
+
+.session:last-child {
+    border-bottom: none;
+}
+
+.total {
+    margin-top: 15px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.day-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 5px;
+    border-bottom: 1px solid #242733;
+}
+
+.small {
+    color: #9297a6;
+    font-size: 13px;
+}
+
+.empty {
+    color: #888;
+    padding: 20px 0;
+}
+
+@media(max-width:600px) {
+    .container {
+        padding: 14px;
+    }
+
+    .live {
+        display: block;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .session {
+        display: block;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Telegram Activity</h1>
+
+<!-- LIVE STATUS -->
+<div class="card">
+
+<div class="label">LIVE STATUS</div>
+
+<div id="liveStatus" class="status offline">
+    Loading...
+</div>
+
+<br>
+
+<div class="stats">
+
+<div class="stat">
+<div class="label">Online Since</div>
+<div id="onlineSince" class="value">—</div>
+</div>
+
+<div class="stat">
+<div class="label">Last Seen</div>
+<div id="lastSeen" class="value">—</div>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- TODAY -->
+<div class="card">
+
+<div class="label">TODAY'S RECORD</div>
+
+<div class="stats">
+
+<div class="stat">
+<div class="label">Total Online</div>
+<div id="todayTotal" class="value">0s</div>
+</div>
+
+<div class="stat">
+<div class="label">Sessions</div>
+<div id="todaySessions" class="value">0</div>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- SELECT DAY -->
+<div class="card">
+
+<div class="label">ACTIVITY HISTORY</div>
+
+<select id="daySelect">
+<option value="all">All 7 Days</option>
+</select>
+
+</div>
+
+
+<!-- SUMMARY -->
+<div class="card" id="summaryCard">
+
+<div class="label">7-DAY SUMMARY</div>
+
+<div id="summary"></div>
+
+</div>
+
+
+<!-- DETAILS -->
+<div class="card" id="detailsCard">
+
+<div class="label">DAY DETAILS</div>
+
+<div id="details"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let data = null;
+
+const DATA_URL = "activity_7days.json";
+
+function formatDuration(seconds) {
+
+    seconds = Math.max(0, Math.floor(seconds));
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    if (h > 0)
+        return `${h}h ${m}m`;
+
+    if (m > 0)
+        return `${m}m ${s}s`;
+
+    return `${s}s`;
+}
+
+
+function timeOnly(iso) {
+
+    if (!iso) return "—";
+
+    return new Date(iso).toLocaleTimeString(
+        "en-IN",
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        }
+    );
+}
+
+
+function dateOnly(iso) {
+
+    return new Date(iso).toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+}
+
+
+function getSessionsForDay(dateString) {
+
+    if (!data || !data.sessions)
+        return [];
+
+    return data.sessions.filter(session => {
+
+        return session.start.substring(0,10) === dateString;
+
+    });
+}
+
+
+function calculateTotal(sessions) {
+
+    let total = 0;
+
+    sessions.forEach(session => {
+
+        const start = new Date(session.start);
+        const end = new Date(session.end);
+
+        total += (end - start) / 1000;
+
+    });
+
+    return total;
+}
+
+
+function renderLive() {
+
+    const status =
+        data.current_online_since
+        ? "ONLINE"
+        : "OFFLINE";
+
+    const statusEl =
+        document.getElementById("liveStatus");
+
+    statusEl.textContent =
+        status === "ONLINE"
+        ? "🟢 ONLINE"
+        : "⚪ OFFLINE";
+
+    statusEl.className =
+        "status " +
+        (status === "ONLINE"
+        ? "online"
+        : "offline");
+
+    if (status === "ONLINE") {
+
+        document.getElementById("onlineSince")
+            .textContent =
+            timeOnly(data.current_online_since);
+
+    } else {
+
+        document.getElementById("onlineSince")
+            .textContent = "—";
+    }
+
+    if (data.sessions.length) {
+
+        const latest =
+            data.sessions[data.sessions.length - 1];
+
+        document.getElementById("lastSeen")
+            .textContent =
+            dateOnly(latest.end)
+            + " "
+            + timeOnly(latest.end);
+
+    }
+
+}
+
+
+function renderToday() {
+
+    const today =
+        new Date().toISOString().substring(0,10);
+
+    const sessions =
+        getSessionsForDay(today);
+
+    document.getElementById("todaySessions")
+        .textContent = sessions.length;
+
+    document.getElementById("todayTotal")
+        .textContent =
+        formatDuration(calculateTotal(sessions));
+
+}
+
+
+function renderSummary() {
+
+    const summary =
+        document.getElementById("summary");
+
+    summary.innerHTML = "";
+
+    const days = {};
+
+    data.sessions.forEach(session => {
+
+        const day =
+            session.start.substring(0,10);
+
+        if (!days[day])
+            days[day] = [];
+
+        days[day].push(session);
+
+    });
+
+    Object.keys(days)
+        .sort()
+        .reverse()
+        .forEach(day => {
+
+            const sessions = days[day];
+
+            const total =
+                calculateTotal(sessions);
+
+            const row =
+                document.createElement("div");
+
+            row.className = "day-row";
+
+            row.innerHTML = `
+                <div>
+                    <b>${formatDay(day)}</b>
+                    <div class="small">
+                        ${sessions.length} session${sessions.length !== 1 ? "s" : ""}
+                    </div>
+                </div>
+
+                <b>${formatDuration(total)}</b>
+            `;
+
+            summary.appendChild(row);
+
+        });
+
+}
+
+
+function renderDetails(day) {
+
+    const details =
+        document.getElementById("details");
+
+    details.innerHTML = "";
+
+    if (day === "all") {
+
+        document.getElementById("detailsCard")
+            .style.display = "none";
+
+        return;
+
+    }
+
+    document.getElementById("detailsCard")
+        .style.display = "block";
+
+    const sessions =
+        getSessionsForDay(day);
+
+    if (!sessions.length) {
+
+        details.innerHTML =
+            `<div class="empty">
+                No recorded activity
+             </div>`;
+
+        return;
+    }
+
+    sessions.forEach(session => {
+
+        const start =
+            new Date(session.start);
+
+        const end =
+            new Date(session.end);
+
+        const duration =
+            (end - start) / 1000;
+
+        const div =
+            document.createElement("div");
+
+        div.className = "session";
+
+        div.innerHTML = `
+            <div>
+                🟢 ${timeOnly(session.start)}
+                → ${timeOnly(session.end)}
+            </div>
+
+            <b>${formatDuration(duration)}</b>
+        `;
+
+        details.appendChild(div);
+
+    });
+
+}
+
+
+function formatDay(day) {
+
+    const d =
+        new Date(day + "T00:00:00");
+
+    return d.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short"
+        }
+    );
+
+}
+
+
+function populateDays() {
+
+    const select =
+        document.getElementById("daySelect");
+
+    const days =
+        [...new Set(
+            data.sessions.map(
+                s => s.start.substring(0,10)
+            )
+        )];
+
+    days.sort().reverse();
+
+    days.forEach(day => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = day;
+        option.textContent = formatDay(day);
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+async function loadData() {
+
+    try {
+
+        const response =
+            await fetch(
+                DATA_URL + "?t=" + Date.now()
+            );
+
+        data = await response.json();
+
+        renderLive();
+        renderToday();
+
+        document.getElementById("summaryCard")
+            .style.display = "block";
+
+        renderSummary();
+
+        renderDetails(
+            document.getElementById("daySelect").value
+        );
+
+    } catch(error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+document
+.getElementById("daySelect")
+.addEventListener("change", function() {
+
+    renderDetails(this.value);
+
+});
+
+
+loadData();
+
+setInterval(loadData, 60000);
+
+</script>
+
+</body>
+</html>
