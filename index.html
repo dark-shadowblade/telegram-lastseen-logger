@@ -11,93 +11,367 @@
     box-sizing: border-box;
 }
 
+:root {
+    --bg: #07090d;
+    --card: #10141b;
+    --card2: #0c1016;
+    --border: #202733;
+    --text: #f3f5f7;
+    --muted: #89919e;
+    --accent: #2ea6ff;
+    --green: #25e27a;
+    --red: #ff4d5a;
+}
+
 body {
     margin: 0;
-    background: #000;
-    color: white;
-    font-family: Arial, sans-serif;
-    padding: 20px;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top, #17202c 0%, #07090d 45%);
+    color: var(--text);
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
 
 .container {
-    max-width: 900px;
-    margin: auto;
+    width: min(1050px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 45px 0 60px;
 }
 
-h1 {
+/* HEADER */
+
+.header {
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: clamp(30px, 5vw, 44px);
+    font-weight: 750;
+    letter-spacing: -1.5px;
+}
+
+.header p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* ERROR */
+
+.error {
+    display: none;
+    padding: 14px 16px;
     margin-bottom: 20px;
+    border-radius: 12px;
+    background: rgba(255, 77, 90, 0.1);
+    border: 1px solid rgba(255, 77, 90, 0.35);
+    color: #ff7c86;
 }
 
-.cards {
+/* MAIN STATUS */
+
+.status-card {
+    background:
+        linear-gradient(135deg, #121821, #0d1117);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #777;
+    box-shadow: 0 0 0 5px rgba(120,120,120,.08);
+}
+
+.status-dot.online {
+    background: var(--green);
+    box-shadow:
+        0 0 0 5px rgba(37,226,122,.10),
+        0 0 18px rgba(37,226,122,.55);
+}
+
+.status-dot.offline {
+    background: var(--red);
+    box-shadow: 0 0 0 5px rgba(255,77,90,.08);
+}
+
+.status-title {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-value {
+    margin-top: 4px;
+    font-size: 24px;
+    font-weight: 750;
+}
+
+.status-time {
+    text-align: right;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* STAT GRID */
+
+.stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 35px;
 }
 
 .card {
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 18px;
+    background: rgba(16,20,27,.9);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 19px;
+    min-height: 105px;
 }
 
-.label {
-    color: #888;
-    font-size: 13px;
-    margin-bottom: 8px;
+.card-label {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    margin-bottom: 12px;
 }
 
-.value {
+.card-value {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+/* SECTIONS */
+
+.section {
+    margin-top: 30px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.section h2 {
+    margin: 0;
     font-size: 20px;
-    font-weight: bold;
+    letter-spacing: -.3px;
 }
 
-.online {
-    color: #00ff66;
-}
-
-.offline {
-    color: #ff4444;
-}
+/* DAY SELECT */
 
 select {
     width: 100%;
-    padding: 12px;
-    margin: 20px 0;
-    background: #111;
+    appearance: none;
+    background:
+        linear-gradient(45deg, transparent 50%, #aaa 50%) calc(100% - 20px) 50% / 6px 6px no-repeat,
+        linear-gradient(135deg, #aaa 50%, transparent 50%) calc(100% - 15px) 50% / 6px 6px no-repeat,
+        #10141b;
+
     color: white;
-    border: 1px solid #444;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 15px 45px 15px 16px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
 }
 
-.section {
-    margin-top: 20px;
+select:focus {
+    border-color: #36516d;
 }
 
-.day {
-    background: #111;
-    border: 1px solid #333;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+/* 7 DAY SUMMARY */
+
+.summary-list {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.day-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 17px 19px;
+    border-bottom: 1px solid #1b212b;
+}
+
+.day-row:last-child {
+    border-bottom: none;
+}
+
+.day-name {
+    font-weight: 650;
+}
+
+.day-date {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.day-duration {
+    font-weight: 650;
+    text-align: right;
+}
+
+.day-sessions {
+    color: var(--muted);
+    font-size: 12px;
+    min-width: 70px;
+    text-align: right;
+}
+
+/* DETAILS */
+
+.details-box {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.details-header {
+    padding: 17px 19px;
+    border-bottom: 1px solid #1b212b;
+    font-weight: 700;
 }
 
 .session {
-    padding: 10px 0;
-    border-bottom: 1px solid #222;
+    padding: 18px 19px;
+    border-bottom: 1px solid #1b212b;
 }
 
-.error {
-    background: #300;
-    border: 1px solid #900;
-    padding: 12px;
-    border-radius: 8px;
-    display: none;
-    margin-bottom: 15px;
+.session:last-child {
+    border-bottom: none;
 }
 
-.muted {
-    color: #888;
+.session-time {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 9px;
+}
+
+.session-start {
+    font-weight: 650;
+}
+
+.session-duration {
+    color: var(--accent);
+    font-weight: 650;
+}
+
+.session-end {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* EMPTY */
+
+.empty {
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* FOOTER */
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #606975;
+    font-size: 12px;
+}
+
+/* MOBILE */
+
+@media (max-width: 750px) {
+
+    .container {
+        width: min(100% - 20px, 600px);
+        padding-top: 28px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .status-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .status-time {
+        text-align: left;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .card {
+        padding: 15px;
+        min-height: 95px;
+    }
+
+    .card-value {
+        font-size: 16px;
+    }
+
+    .day-row {
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .day-sessions {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .day-duration {
+        grid-column: 1;
+        text-align: left;
+        color: var(--accent);
+    }
+
 }
 </style>
 </head>
@@ -106,64 +380,107 @@ select {
 
 <div class="container">
 
-<h1>Telegram Activity</h1>
-
-<div id="error" class="error"></div>
-
-<div class="cards">
-
-    <div class="card">
-        <div class="label">Live Status</div>
-        <div id="status" class="value">Loading...</div>
+    <div class="header">
+        <h1>Telegram Activity</h1>
+        <p>Activity monitoring dashboard</p>
     </div>
 
-    <div class="card">
-        <div class="label">Online Since</div>
-        <div id="onlineSince" class="value">—</div>
+    <div id="error" class="error"></div>
+
+    <!-- CURRENT STATUS -->
+
+    <div class="status-card">
+
+        <div class="status-left">
+
+            <div id="statusDot" class="status-dot"></div>
+
+            <div>
+                <div class="status-title">Current Status</div>
+                <div id="status" class="status-value">
+                    Loading...
+                </div>
+            </div>
+
+        </div>
+
+        <div id="updatedAt" class="status-time">
+            Updating...
+        </div>
+
     </div>
 
-    <div class="card">
-        <div class="label">Last Seen</div>
-        <div id="lastSeen" class="value">—</div>
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+        <div class="card">
+            <div class="card-label">Online Since</div>
+            <div id="onlineSince" class="card-value">—</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Last Seen</div>
+            <div id="lastSeen" class="card-value">—</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Today Online</div>
+            <div id="todayTotal" class="card-value">0s</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Sessions</div>
+            <div id="sessionCount" class="card-value">0</div>
+        </div>
+
     </div>
 
-    <div class="card">
-        <div class="label">Today Total Online</div>
-        <div id="todayTotal" class="value">0s</div>
+
+    <!-- ACTIVITY HISTORY -->
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Activity History</h2>
+        </div>
+
+        <select id="daySelect">
+            <option value="all">All 7 Days</option>
+        </select>
+
     </div>
 
-    <div class="card">
-        <div class="label">Sessions</div>
-        <div id="sessionCount" class="value">0</div>
+
+    <!-- SUMMARY -->
+
+    <div class="section">
+
+        <div id="summary" class="summary-list"></div>
+
+    </div>
+
+
+    <!-- DETAILS -->
+
+    <div class="section">
+
+        <div class="section-header">
+            <h2>Day Details</h2>
+        </div>
+
+        <div id="details" class="details-box"></div>
+
+    </div>
+
+
+    <div class="footer">
+        Automatically refreshes every 60 seconds
     </div>
 
 </div>
 
-<div class="section">
-
-<h2>Activity History</h2>
-
-<select id="daySelect">
-    <option value="all">All 7 Days</option>
-</select>
-
-<div id="summary"></div>
-
-</div>
-
-<div class="section">
-
-<h2>Day Details</h2>
-
-<div id="details"></div>
-
-</div>
-
-<p class="muted">
-Automatically refreshes every 60 seconds
-</p>
-
-</div>
 
 <script>
 
@@ -194,37 +511,25 @@ function formatDateTime(iso) {
 }
 
 
+function formatShortDate(day) {
+
+    const d = new Date(day + "T00:00:00");
+
+    return new Intl.DateTimeFormat("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    }).format(d);
+
+}
+
+
 function getDayKey(date) {
 
     return new Intl.DateTimeFormat("en-CA", {
         timeZone: TIMEZONE
     }).format(date);
 
-}
-
-
-function formatDuration(seconds) {
-
-    seconds = Math.max(0, Math.floor(seconds));
-
-    const days = Math.floor(seconds / 86400);
-    seconds %= 86400;
-
-    const hours = Math.floor(seconds / 3600);
-    seconds %= 3600;
-
-    const minutes = Math.floor(seconds / 60);
-    seconds %= 60;
-
-    let result = [];
-
-    if (days) result.push(days + "d");
-    if (hours) result.push(hours + "h");
-    if (minutes) result.push(minutes + "m");
-
-    result.push(seconds + "s");
-
-    return result.join(" ");
 }
 
 
@@ -249,24 +554,30 @@ function getLast7Days() {
 }
 
 
-function populateDays() {
+function formatDuration(seconds) {
 
-    const select = $("daySelect");
+    seconds = Math.max(0, Math.floor(seconds));
 
-    select.innerHTML =
-        '<option value="all">All 7 Days</option>';
+    const days = Math.floor(seconds / 86400);
+    seconds %= 86400;
 
-    getLast7Days().forEach(day => {
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
 
-        const option = document.createElement("option");
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
 
-        option.value = day;
-        option.textContent = day;
+    const parts = [];
 
-        select.appendChild(option);
+    if (days) parts.push(days + "d");
+    if (hours) parts.push(hours + "h");
+    if (minutes) parts.push(minutes + "m");
 
-    });
+    if (!parts.length || seconds) {
+        parts.push(seconds + "s");
+    }
 
+    return parts.join(" ");
 }
 
 
@@ -296,7 +607,11 @@ function getTodayTotal() {
 
     for (const session of data.sessions || []) {
 
-        if (getDayKey(new Date(session.start)) === today) {
+        if (
+            getDayKey(
+                new Date(session.start)
+            ) === today
+        ) {
 
             total += sessionDuration(session);
 
@@ -314,8 +629,9 @@ function getTodayTotal() {
 
             total +=
                 (Date.now() -
-                new Date(data.current_online_since).getTime())
-                / 1000;
+                new Date(
+                    data.current_online_since
+                ).getTime()) / 1000;
 
         }
 
@@ -326,7 +642,33 @@ function getTodayTotal() {
 }
 
 
+function populateDays() {
+
+    const select = $("daySelect");
+
+    select.innerHTML =
+        '<option value="all">All 7 Days</option>';
+
+    getLast7Days().forEach(day => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = day;
+
+        option.textContent =
+            formatShortDate(day);
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
 function renderTop() {
+
+    if (!data) return;
 
     const status =
         data.last_status ||
@@ -334,26 +676,28 @@ function renderTop() {
             ? "ONLINE"
             : "OFFLINE");
 
-    const statusElement = $("status");
+    $("status").textContent = status;
 
-    statusElement.textContent = status;
+    const dot = $("statusDot");
 
-    statusElement.className = "value";
+    dot.className = "status-dot";
 
     if (status === "ONLINE") {
 
-        statusElement.classList.add("online");
+        dot.classList.add("online");
 
     } else {
 
-        statusElement.classList.add("offline");
+        dot.classList.add("offline");
 
     }
 
 
     $("onlineSince").textContent =
         data.current_online_since
-            ? formatDateTime(data.current_online_since)
+            ? formatDateTime(
+                data.current_online_since
+              )
             : "—";
 
 
@@ -364,11 +708,48 @@ function renderTop() {
 
 
     $("todayTotal").textContent =
-        formatDuration(getTodayTotal());
+        formatDuration(
+            getTodayTotal()
+        );
 
 
     $("sessionCount").textContent =
         (data.sessions || []).length;
+
+
+    $("updatedAt").textContent =
+        data.updated_at
+            ? "Updated " +
+              formatDateTime(data.updated_at)
+            : "Waiting for update";
+
+}
+
+
+function getDayStats(day) {
+
+    let total = 0;
+    let count = 0;
+
+    for (const session of data.sessions || []) {
+
+        if (
+            getDayKey(
+                new Date(session.start)
+            ) === day
+        ) {
+
+            total += sessionDuration(session);
+            count++;
+
+        }
+
+    }
+
+    return {
+        total,
+        count
+    };
 
 }
 
@@ -379,41 +760,37 @@ function renderSummary() {
 
     container.innerHTML = "";
 
-    const days = getLast7Days();
+    getLast7Days().forEach(day => {
 
-    days.forEach(day => {
+        const stats =
+            getDayStats(day);
 
-        let total = 0;
-        let count = 0;
+        const row =
+            document.createElement("div");
 
-        for (const session of data.sessions || []) {
+        row.className = "day-row";
 
-            if (
-                getDayKey(
-                    new Date(session.start)
-                ) === day
-            ) {
+        row.innerHTML = `
+            <div>
+                <div class="day-name">
+                    ${day}
+                </div>
+                <div class="day-date">
+                    ${formatShortDate(day)}
+                </div>
+            </div>
 
-                total += sessionDuration(session);
-                count++;
+            <div class="day-duration">
+                ${formatDuration(stats.total)}
+            </div>
 
-            }
-
-        }
-
-        const div = document.createElement("div");
-
-        div.className = "day";
-
-        div.innerHTML = `
-            <strong>${day}</strong>
-            <br>
-            Online: ${formatDuration(total)}
-            <br>
-            Sessions: ${count}
+            <div class="day-sessions">
+                ${stats.count}
+                ${stats.count === 1 ? "session" : "sessions"}
+            </div>
         `;
 
-        container.appendChild(div);
+        container.appendChild(row);
 
     });
 
@@ -426,25 +803,52 @@ function renderDetails() {
 
     container.innerHTML = "";
 
-    let sessions = data.sessions || [];
+    let sessions =
+        data.sessions || [];
+
 
     if (selectedDay !== "all") {
 
-        sessions = sessions.filter(session =>
-
-            getDayKey(
-                new Date(session.start)
-            ) === selectedDay
-
+        sessions = sessions.filter(
+            session =>
+                getDayKey(
+                    new Date(session.start)
+                ) === selectedDay
         );
 
     }
 
 
+    const title =
+        selectedDay === "all"
+            ? "All recorded sessions"
+            : formatShortDate(selectedDay);
+
+
+    const header =
+        document.createElement("div");
+
+    header.className =
+        "details-header";
+
+    header.textContent = title;
+
+    container.appendChild(header);
+
+
     if (!sessions.length) {
 
-        container.innerHTML =
-            '<div class="muted">No recorded sessions.</div>';
+        const empty =
+            document.createElement("div");
+
+        empty.className = "empty";
+
+        empty.textContent =
+            selectedDay === "all"
+                ? "No recorded sessions yet."
+                : "No sessions recorded on this day.";
+
+        container.appendChild(empty);
 
         return;
 
@@ -459,24 +863,33 @@ function renderDetails() {
             const div =
                 document.createElement("div");
 
-            div.className = "day";
+            div.className = "session";
 
             div.innerHTML = `
-                <div class="session">
-                    <strong>
+
+                <div class="session-time">
+
+                    <div class="session-start">
                         ${formatDateTime(session.start)}
-                    </strong>
-                    <br>
+                    </div>
+
+                    <div class="session-duration">
+                        ${formatDuration(
+                            sessionDuration(session)
+                        )}
+                    </div>
+
+                </div>
+
+                <div class="session-end">
                     End:
                     ${
                         session.end
-                        ? formatDateTime(session.end)
-                        : "Currently online"
+                            ? formatDateTime(session.end)
+                            : "Currently online"
                     }
-                    <br>
-                    Duration:
-                    ${formatDuration(sessionDuration(session))}
                 </div>
+
             `;
 
             container.appendChild(div);
@@ -501,15 +914,15 @@ async function loadData() {
 
     try {
 
-        const url =
-            DATA_URL +
-            "?t=" +
-            Date.now();
-
         const response =
-            await fetch(url, {
-                cache: "no-store"
-            });
+            await fetch(
+                DATA_URL +
+                "?t=" +
+                Date.now(),
+                {
+                    cache: "no-store"
+                }
+            );
 
         if (!response.ok) {
 
@@ -519,9 +932,11 @@ async function loadData() {
 
         }
 
-        data = await response.json();
+        data =
+            await response.json();
 
-        $("error").style.display = "none";
+        $("error").style.display =
+            "none";
 
         render();
 
@@ -530,7 +945,8 @@ async function loadData() {
 
         console.error(error);
 
-        $("error").style.display = "block";
+        $("error").style.display =
+            "block";
 
         $("error").textContent =
             "Unable to load activity data: " +
@@ -548,7 +964,8 @@ $("daySelect").addEventListener(
     "change",
     function () {
 
-        selectedDay = this.value;
+        selectedDay =
+            this.value;
 
         renderDetails();
 
@@ -560,17 +977,21 @@ populateDays();
 
 loadData();
 
-setInterval(loadData, 60000);
+setInterval(
+    loadData,
+    60000
+);
 
-setInterval(() => {
+setInterval(
+    () => {
 
-    if (data) {
+        if (data) {
+            renderTop();
+        }
 
-        renderTop();
-
-    }
-
-}, 1000);
+    },
+    1000
+);
 
 </script>
 
