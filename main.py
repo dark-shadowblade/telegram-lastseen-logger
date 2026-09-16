@@ -47,7 +47,7 @@ def start_web_server():
 
     print("PORT environment variable:", port_env)
 
-    port = int(port_env or "8080")
+    port = int(port_env or "3000")
 
     server = ThreadingHTTPServer(
         ("0.0.0.0", port),
