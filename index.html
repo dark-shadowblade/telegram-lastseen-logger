@@ -464,7 +464,7 @@ select:focus {
 
 
     <div class="footer">
-        Automatically refreshes every 60 seconds
+        Automatically refreshes every 2 seconds
     </div>
 
 </div>
@@ -505,6 +505,13 @@ function getDayKey(date) {
 }
 
 
+/*
+==================================================
+DATE + TIME
+EVERY TIMESTAMP INCLUDES SECONDS
+==================================================
+*/
+
 function formatDateTime(iso) {
 
     if (!iso) return "—";
@@ -512,7 +519,7 @@ function formatDateTime(iso) {
     return new Intl.DateTimeFormat("en-IN", {
         timeZone: TIMEZONE,
         dateStyle: "medium",
-        timeStyle: "short"
+        timeStyle: "medium"
     }).format(new Date(iso));
 
 }
@@ -525,7 +532,8 @@ function formatTime(iso) {
     return new Intl.DateTimeFormat("en-IN", {
         timeZone: TIMEZONE,
         hour: "numeric",
-        minute: "2-digit"
+        minute: "2-digit",
+        second: "2-digit"
     }).format(new Date(iso));
 
 }
@@ -798,6 +806,9 @@ function populateSelector() {
     const select =
         $("daySelect");
 
+    const previous =
+        selectedDay;
+
     select.innerHTML = "";
 
 
@@ -864,8 +875,25 @@ function populateSelector() {
     select.appendChild(all);
 
 
-    select.value =
-        selectedDay;
+    if (
+        [...select.options]
+        .some(option =>
+            option.value === previous
+        )
+    ) {
+
+        select.value =
+            previous;
+
+    } else {
+
+        selectedDay =
+            "today";
+
+        select.value =
+            "today";
+
+    }
 
 }
 
@@ -930,7 +958,9 @@ function renderSessions(
                             ? formatTime(
                                 session.end
                               )
-                            : "Now"
+                            : formatTime(
+                                new Date().toISOString()
+                              )
                         }
 
                     </div>
@@ -1242,140 +1272,3 @@ function renderHistory() {
 
     const day =
         selectedDay === "today"
-        ? getDayKey(new Date())
-        : selectedDay;
-
-
-    renderSingleDay(day);
-
-}
-
-
-/* RENDER EVERYTHING */
-
-function render() {
-
-    renderTop();
-
-    renderHistory();
-
-}
-
-
-/* LOAD JSON */
-
-async function loadData() {
-
-    try {
-
-        const response =
-            await fetch(
-                DATA_URL +
-                "?t=" +
-                Date.now(),
-                {
-                    cache: "no-store"
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "HTTP " +
-                response.status
-            );
-
-        }
-
-
-        data =
-            await response.json();
-
-
-        $("error").style.display =
-            "none";
-
-
-        render();
-
-    }
-    catch (error) {
-
-        console.error(error);
-
-
-        $("error").style.display =
-            "block";
-
-
-        $("error").textContent =
-            "Unable to load activity data: " +
-            error.message;
-
-
-        $("status").textContent =
-            "Data Error";
-
-    }
-
-}
-
-
-/* SELECTOR CHANGE */
-
-$("daySelect").addEventListener(
-    "change",
-    function() {
-
-        selectedDay =
-            this.value;
-
-        renderHistory();
-
-    }
-);
-
-
-/* INITIALIZE */
-
-populateSelector();
-
-loadData();
-
-
-/* REFRESH FROM GITHUB EVERY 60 SEC */
-
-setInterval(
-    loadData,
-    60000
-);
-
-
-/* UPDATE LIVE ONLINE DURATION */
-
-setInterval(
-    () => {
-
-        if (data) {
-
-            renderTop();
-
-            if (
-                selectedDay !== "all"
-            ) {
-
-                renderHistory();
-
-            }
-
-        }
-
-    },
-    1000
-);
-
-</script>
-
-</body>
-</html>
